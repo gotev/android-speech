@@ -175,8 +175,20 @@ public class Speech {
 
         mTextToSpeech = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
             @Override
-            public void onInit(int i) {
+            public void onInit(int status) {
+                switch (status) {
+                    case TextToSpeech.SUCCESS:
+                        Log.i(Speech.class.getSimpleName(), "TextToSpeech engine successfully started");
+                        break;
 
+                    case TextToSpeech.ERROR:
+                        Log.e(Speech.class.getSimpleName(), "Error while initializing TextToSpeech engine!");
+                        break;
+
+                    default:
+                        Log.e(Speech.class.getSimpleName(), "Unknown TextToSpeech status: " + status);
+                        break;
+                }
             }
         });
 

@@ -52,8 +52,7 @@ public class MainActivity extends AppCompatActivity implements Speech.Delegate {
                             delayedStopListening.start(new DelayedOperation.Operation() {
                                 @Override
                                 public void onDelayedOperation() {
-                                    Log.e(MainActivity.class.getSimpleName(), "onDelayedOperation");
-                                    runOnUiThread(() -> Speech.getInstance().stopListening());
+                                    Speech.getInstance().stopListening();
                                 }
 
                                 @Override

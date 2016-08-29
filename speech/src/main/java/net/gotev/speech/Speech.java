@@ -11,6 +11,7 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -121,7 +122,9 @@ public class Speech {
     private float mTtsRate = 1.0f;
     private float mTtsPitch = 1.0f;
     private long mForceStopDelayInMs = 2000;
-    private long mStopListeningDelayInMs = 1600;
+    private long mStopListeningDelayInMs = 3000;
+    private long mMinimumStartStopDelay = 1000;
+    private long mStartTimestamp;
 
     private Speech(Context context) {
         commonInitializer(context);
@@ -296,6 +299,7 @@ public class Speech {
 
         mSpeechRecognizer.startListening(intent);
         mIsListening = true;
+        mStartTimestamp = new Date().getTime();
         mDelegate.onStartOfSpeech();
 
         mDelayedStopListening.start(new DelayedOperation.Operation() {
@@ -314,6 +318,11 @@ public class Speech {
 
     public void stopListening() {
         if (!mIsListening) return;
+
+        if (new Date().getTime() <= (mStartTimestamp + mMinimumStartStopDelay)) {
+            Log.d(getClass().getSimpleName(), "Hey man calm down! Throttling stop to prevent disaster!");
+            return;
+        }
 
         mIsListening = false;
         mSpeechRecognizer.stopListening();
@@ -373,6 +382,10 @@ public class Speech {
     public void setStopListeningAfterInactivity(long milliseconds) {
         mStopListeningDelayInMs = milliseconds;
         initDelayedStopListening(mContext);
+    }
+
+    public void setMinimumStartStopDelay(long milliseconds) {
+        mMinimumStartStopDelay = milliseconds;
     }
 
     public void say(String message) {

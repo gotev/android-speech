@@ -2,7 +2,6 @@ package net.gotev.speech;
 
 import android.content.Context;
 import android.os.Handler;
-import android.util.Log;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -11,6 +10,8 @@ import java.util.TimerTask;
  * @author Aleksandar Gotev
  */
 public class DelayedOperation {
+
+    private static final String LOG_TAG = DelayedOperation.class.getSimpleName();
 
     public interface Operation {
         void onDelayedOperation();
@@ -36,6 +37,7 @@ public class DelayedOperation {
         mContext = context;
         mTag = tag;
         mDelay = delayInMilliseconds;
+        Logger.debug(LOG_TAG, "created delayed operation with tag: " + mTag);
     }
 
     public void start(final Operation operation) {
@@ -43,7 +45,7 @@ public class DelayedOperation {
             throw new IllegalArgumentException("The operation must be defined!");
         }
 
-        Log.d(Speech.class.getSimpleName(), "Starting delayed operation with tag: " + mTag);
+        Logger.debug(LOG_TAG, "starting delayed operation with tag: " + mTag);
         mOperation = operation;
         cancel();
         started = true;
@@ -51,21 +53,17 @@ public class DelayedOperation {
     }
 
     public void resetTimer() {
-        if (!started) {
-            throw new IllegalStateException("Start the operation first!");
-        }
+        if (!started) return;
 
         if (mTimer != null) mTimer.cancel();
 
-        Log.d(mTag, "Resetting delayed operation");
+        Logger.debug(LOG_TAG, "resetting delayed operation with tag: " + mTag);
         mTimer = new Timer();
         mTimer.schedule(new TimerTask() {
             @Override
             public void run() {
                 if (mOperation.shouldExecuteDelayedOperation()) {
-                    Log.d(Speech.class.getSimpleName(), "Executing delayed operation with tag: "
-                            + mTag + " on the main thread");
-
+                    Logger.debug(LOG_TAG, "executing delayed operation with tag: " + mTag);
                     new Handler(mContext.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
@@ -80,7 +78,7 @@ public class DelayedOperation {
 
     public void cancel() {
         if (mTimer != null) {
-            Log.d(Speech.class.getSimpleName(), "Cancelled delayed operation with tag: " + mTag);
+            Logger.debug(LOG_TAG, "cancelled delayed operation with tag: " + mTag);
             mTimer.cancel();
             mTimer = null;
         }

@@ -12,7 +12,6 @@ import com.tbruyelle.rxpermissions.RxPermissions;
 
 import net.gotev.speech.Speech;
 import net.gotev.speech.SpeechDelegate;
-import net.gotev.speech.SpeechRecognitionException;
 import net.gotev.speech.SpeechRecognitionNotAvailable;
 import net.gotev.toyproject.R;
 
@@ -68,13 +67,18 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
 
     @Override
     public void onSpeechRmsChanged(float value) {
-        Log.d(getClass().getSimpleName(), "Speech recognition rms is now " + value +  "dB");
+        //Log.d(getClass().getSimpleName(), "Speech recognition rms is now " + value +  "dB");
     }
 
     @Override
     public void onSpeechResult(String result) {
+        button.setText(getString(R.string.start_listening));
+        Log.i(getClass().getSimpleName(), "onSpeechResult");
         text.setText("Result: " + result);
-        Speech.getInstance().say(result);
+        if (result.isEmpty())
+            Speech.getInstance().say("Ripeti per favore");
+        else
+            Speech.getInstance().say(result);
     }
 
     @Override
@@ -87,18 +91,8 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
 
     @Override
     public void onStartOfSpeech() {
-        Log.i(getClass().getSimpleName(), "Speech recognition started");
+        Log.i(getClass().getSimpleName(), "onStartOfSpeech");
         button.setText(getString(R.string.stop_listening));
     }
 
-    @Override
-    public void onEndOfSpeech() {
-        Log.i(getClass().getSimpleName(), "Speech recognition ended");
-        button.setText(getString(R.string.start_listening));
-    }
-
-    @Override
-    public void onError(SpeechRecognitionException exception) {
-        Log.e(getClass().getSimpleName(), "Speech recognition error", exception);
-    }
 }

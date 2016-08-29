@@ -2,6 +2,7 @@ package net.gotev.speechdemo;
 
 import android.app.Application;
 
+import net.gotev.speech.Logger;
 import net.gotev.speech.Speech;
 
 /**
@@ -12,6 +13,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        Speech.init(this);
+        Speech.init(this, getPackageName());
+        Logger.setLogLevel(Logger.LogLevel.DEBUG);
     }
 }

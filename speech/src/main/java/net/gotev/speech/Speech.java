@@ -194,7 +194,7 @@ public class Speech {
 
     /**
      * Gets speech recognition instance.
-     * @return @link{SpeechRecognition} instance
+     * @return SpeechRecognition instance
      */
     public static Speech getInstance() {
         if (instance == null) {
@@ -225,6 +225,7 @@ public class Speech {
     /**
      * Starts voice recognition with the device default language.
      *
+     * @param delegate delegate which will receive speech recognition events and status
      * @throws SpeechRecognitionNotAvailable when speech recognition is not available on the device
      */
     public void startListening(SpeechDelegate delegate)
@@ -234,6 +235,7 @@ public class Speech {
 
     /**
      * Starts voice recognition with a custom recognition language.
+     * @param delegate delegate which will receive speech recognition events and status
      * @param overrideLanguage custom recognition language in the form of "en-US". Null to use
      *                         the device default language
      * @throws SpeechRecognitionNotAvailable when speech recognition is not available on the device

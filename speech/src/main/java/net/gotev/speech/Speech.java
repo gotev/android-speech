@@ -57,6 +57,8 @@ public class Speech {
 
         @Override
         public void onResults(Bundle bundle) {
+            mDelayedStopListening.cancel();
+
             Log.i(getClass().getSimpleName(), "stopping delayed force stop");
             mDelayedForceStop.cancel();
 
@@ -80,6 +82,8 @@ public class Speech {
 
         @Override
         public void onPartialResults(Bundle bundle) {
+            mDelayedStopListening.resetTimer();
+
             List<String> partialResults = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
             List<String> unstableData = bundle.getStringArrayList("android.speech.extra.UNSTABLE_TEXT");
 
@@ -109,6 +113,7 @@ public class Speech {
     private String mUnstableData;
 
     private DelayedOperation mDelayedForceStop;
+    private DelayedOperation mDelayedStopListening;
     private Context mContext;
 
     private TextToSpeech mTextToSpeech;
@@ -116,6 +121,7 @@ public class Speech {
     private float mTtsRate = 1.0f;
     private float mTtsPitch = 1.0f;
     private long mForceStopDelayInMs = 2000;
+    private long mStopListeningDelayInMs = 1600;
 
     private Speech(Context context) {
         commonInitializer(context);
@@ -158,8 +164,26 @@ public class Speech {
             }
         });
 
-        if (mDelayedForceStop == null)
-            mDelayedForceStop = new DelayedOperation(context, "delayForceStop", mForceStopDelayInMs);
+        initDelayedForceStop(context);
+        initDelayedStopListening(context);
+    }
+
+    private void initDelayedForceStop(Context context) {
+        if (mDelayedForceStop != null) {
+            mDelayedForceStop.cancel();
+            mDelayedForceStop = null;
+        }
+
+        mDelayedForceStop = new DelayedOperation(context, "delayForceStop", mForceStopDelayInMs);
+    }
+
+    private void initDelayedStopListening(Context context) {
+        if (mDelayedStopListening != null) {
+            mDelayedStopListening.cancel();
+            mDelayedStopListening = null;
+        }
+
+        mDelayedStopListening = new DelayedOperation(context, "delayStopListening", mStopListeningDelayInMs);
     }
 
     /**
@@ -274,6 +298,18 @@ public class Speech {
         mIsListening = true;
         mDelegate.onStartOfSpeech();
 
+        mDelayedStopListening.start(new DelayedOperation.Operation() {
+            @Override
+            public void onDelayedOperation() {
+                stopListening();
+            }
+
+            @Override
+            public boolean shouldExecuteDelayedOperation() {
+                return true;
+            }
+        });
+
     }
 
     public void stopListening() {
@@ -331,6 +367,12 @@ public class Speech {
 
     public void setForceStopDelay(long milliseconds) {
         mForceStopDelayInMs = milliseconds;
+        initDelayedForceStop(mContext);
+    }
+
+    public void setStopListeningAfterInactivity(long milliseconds) {
+        mStopListeningDelayInMs = milliseconds;
+        initDelayedStopListening(mContext);
     }
 
     public void say(String message) {

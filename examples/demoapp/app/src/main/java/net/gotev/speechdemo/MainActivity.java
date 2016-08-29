@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import com.tbruyelle.rxpermissions.RxPermissions;
 
-import net.gotev.speech.DelayedOperation;
 import net.gotev.speech.Speech;
 import net.gotev.speech.SpeechDelegate;
 import net.gotev.speech.SpeechRecognitionException;
@@ -24,7 +23,6 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
     private Button button;
     private Button speak;
     private TextView text;
-    private DelayedOperation delayedStopListening;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +36,6 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         speak.setOnClickListener(view -> onSpeakClick());
 
         text = (TextView) findViewById(R.id.text);
-
-        delayedStopListening = new DelayedOperation(this, "delayStopListen", 1500);
     }
 
     private void onButtonClick() {
@@ -61,17 +57,6 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
     private void onRecordAudioPermissionGranted() {
         try {
             Speech.getInstance().startListening(MainActivity.this);
-            delayedStopListening.start(new DelayedOperation.Operation() {
-                @Override
-                public void onDelayedOperation() {
-                    Speech.getInstance().stopListening();
-                }
-
-                @Override
-                public boolean shouldExecuteDelayedOperation() {
-                    return true;
-                }
-            });
         } catch (SpeechRecognitionNotAvailable exc) {
             Toast.makeText(this, "Speech recognition is not available on this device!", Toast.LENGTH_LONG).show();
         }
@@ -88,7 +73,6 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
 
     @Override
     public void onSpeechResult(String result) {
-        delayedStopListening.cancel();
         text.setText("Result: " + result);
         Speech.getInstance().say(result);
     }
@@ -99,7 +83,6 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         for (String partial : results) {
             text.append(partial + " ");
         }
-        delayedStopListening.resetTimer();
     }
 
     @Override

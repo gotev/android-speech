@@ -304,6 +304,10 @@ public class Speech {
 
     }
 
+    /**
+     * Stops voice recognition listening.
+     * This method does nothing if voice listening is not active
+     */
     public void stopListening() {
         if (!mIsListening) return;
 
@@ -346,10 +350,18 @@ public class Speech {
         });
     }
 
+    /**
+     * Check if voice recognition is currently active.
+     * @return true if the voice recognition is on, false otherwise
+     */
     public boolean isListening() {
         return mIsListening;
     }
 
+    /**
+     * Uses text to speech to transform a written message into a sound.
+     * @param message message to play
+     */
     public void say(String message) {
         mTextToSpeech.setLanguage(mLocale);
         mTextToSpeech.setPitch(mTtsPitch);
@@ -362,6 +374,9 @@ public class Speech {
         }
     }
 
+    /**
+     * Stops text to speech.
+     */
     public void stopTextToSpeech() {
         if (mTextToSpeech != null) {
             mTextToSpeech.stop();

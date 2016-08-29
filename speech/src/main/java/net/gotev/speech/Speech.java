@@ -193,11 +193,14 @@ public class Speech {
      * Initializes speech recognition.
      *
      * @param context application context
+     * @return speech instance
      */
-    public static void init(Context context) {
+    public static Speech init(Context context) {
         if (instance == null) {
             instance = new Speech(context);
         }
+
+        return instance;
     }
 
     /**
@@ -212,11 +215,14 @@ public class Speech {
      *                       it should be overridden by the voice search implementation.
      *                       By passing null or empty string (which is the default) you are
      *                       not overriding the calling package
+     * @return speech instance
      */
-    public static void init(Context context, String callingPackage) {
+    public static Speech init(Context context, String callingPackage) {
         if (instance == null) {
             instance = new Speech(context, callingPackage);
         }
+
+        return instance;
     }
 
     /**
@@ -229,24 +235,6 @@ public class Speech {
         }
 
         return instance;
-    }
-
-    /**
-     * Set whether to only use an offline speech recognition engine.
-     * The default is false, meaning that either network or offline recognition engines may be used.
-     * @param preferOffline true to prefer offline engine, false to use either one of the two
-     */
-    public void setPreferOffline(boolean preferOffline) {
-        mPreferOffline = preferOffline;
-    }
-
-    /**
-     * Set whether partial results should be returned by the recognizer as the user speaks
-     * (default is true). The server may ignore a request for partial results in some or all cases.
-     * @param getPartialResults true to get also partial recognition results, false otherwise
-     */
-    public void setGetPartialResults(boolean getPartialResults) {
-        mGetPartialResults = getPartialResults;
     }
 
     /**
@@ -362,32 +350,6 @@ public class Speech {
         return mIsListening;
     }
 
-    public void setLocale(Locale locale) {
-        mLocale = locale;
-    }
-
-    public void setTextToSpeechRate(float rate) {
-        mTtsRate = rate;
-    }
-
-    public void setTextToSpeechPitch(float pitch) {
-        mTtsPitch = pitch;
-    }
-
-    public void setForceStopDelay(long milliseconds) {
-        mForceStopDelayInMs = milliseconds;
-        initDelayedForceStop(mContext);
-    }
-
-    public void setStopListeningAfterInactivity(long milliseconds) {
-        mStopListeningDelayInMs = milliseconds;
-        initDelayedStopListening(mContext);
-    }
-
-    public void setMinimumStartStopDelay(long milliseconds) {
-        mMinimumStartStopDelay = milliseconds;
-    }
-
     public void say(String message) {
         mTextToSpeech.setLanguage(mLocale);
         mTextToSpeech.setPitch(mTtsPitch);
@@ -404,6 +366,60 @@ public class Speech {
         if (mTextToSpeech != null) {
             mTextToSpeech.stop();
         }
+    }
+
+    /**
+     * Set whether to only use an offline speech recognition engine.
+     * The default is false, meaning that either network or offline recognition engines may be used.
+     * @param preferOffline true to prefer offline engine, false to use either one of the two
+     * @return speech instance
+     */
+    public Speech setPreferOffline(boolean preferOffline) {
+        mPreferOffline = preferOffline;
+        return this;
+    }
+
+    /**
+     * Set whether partial results should be returned by the recognizer as the user speaks
+     * (default is true). The server may ignore a request for partial results in some or all cases.
+     * @param getPartialResults true to get also partial recognition results, false otherwise
+     * @return speech instance
+     */
+    public Speech setGetPartialResults(boolean getPartialResults) {
+        mGetPartialResults = getPartialResults;
+        return this;
+    }
+
+    public Speech setLocale(Locale locale) {
+        mLocale = locale;
+        return this;
+    }
+
+    public Speech setTextToSpeechRate(float rate) {
+        mTtsRate = rate;
+        return this;
+    }
+
+    public Speech setTextToSpeechPitch(float pitch) {
+        mTtsPitch = pitch;
+        return this;
+    }
+
+    public Speech setForceStopDelay(long milliseconds) {
+        mForceStopDelayInMs = milliseconds;
+        initDelayedForceStop(mContext);
+        return this;
+    }
+
+    public Speech setStopListeningAfterInactivity(long milliseconds) {
+        mStopListeningDelayInMs = milliseconds;
+        initDelayedStopListening(mContext);
+        return this;
+    }
+
+    public Speech setMinimumStartStopDelay(long milliseconds) {
+        mMinimumStartStopDelay = milliseconds;
+        return this;
     }
 
 }

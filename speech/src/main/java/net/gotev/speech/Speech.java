@@ -24,6 +24,25 @@ public class Speech {
 
     private static Speech instance = null;
 
+    private TextToSpeech.OnInitListener mTttsInitListener = new TextToSpeech.OnInitListener() {
+        @Override
+        public void onInit(int status) {
+            switch (status) {
+                case TextToSpeech.SUCCESS:
+                    Log.i(Speech.class.getSimpleName(), "TextToSpeech engine successfully started");
+                    break;
+
+                case TextToSpeech.ERROR:
+                    Log.e(Speech.class.getSimpleName(), "Error while initializing TextToSpeech engine!");
+                    break;
+
+                default:
+                    Log.e(Speech.class.getSimpleName(), "Unknown TextToSpeech status: " + status);
+                    break;
+            }
+        }
+    };
+
     private RecognitionListener mListener = new RecognitionListener() {
 
         @Override
@@ -141,34 +160,18 @@ public class Speech {
 
         mContext = context;
 
+        if (mTextToSpeech == null) {
+            mTextToSpeech = new TextToSpeech(context, mTttsInitListener);
+        }
+
         if (SpeechRecognizer.isRecognitionAvailable(context)) {
             mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(context);
             mSpeechRecognizer.setRecognitionListener(mListener);
+            initDelayedForceStop(context);
+            initDelayedStopListening(context);
         } else {
             mSpeechRecognizer = null;
         }
-
-        mTextToSpeech = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
-            @Override
-            public void onInit(int status) {
-                switch (status) {
-                    case TextToSpeech.SUCCESS:
-                        Log.i(Speech.class.getSimpleName(), "TextToSpeech engine successfully started");
-                        break;
-
-                    case TextToSpeech.ERROR:
-                        Log.e(Speech.class.getSimpleName(), "Error while initializing TextToSpeech engine!");
-                        break;
-
-                    default:
-                        Log.e(Speech.class.getSimpleName(), "Unknown TextToSpeech status: " + status);
-                        break;
-                }
-            }
-        });
-
-        initDelayedForceStop(context);
-        initDelayedStopListening(context);
     }
 
     private void initDelayedForceStop(Context context) {

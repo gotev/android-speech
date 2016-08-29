@@ -112,7 +112,7 @@ public class Speech {
     private Context mContext;
 
     private TextToSpeech mTextToSpeech;
-    private Locale mTtsLocale = Locale.getDefault();
+    private Locale mLocale = Locale.getDefault();
     private float mTtsRate = 1.0f;
     private float mTtsPitch = 1.0f;
     private long mForceStopDelayInMs = 2000;
@@ -253,6 +253,7 @@ public class Speech {
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
                 .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
                 .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, mGetPartialResults)
+                .putExtra(RecognizerIntent.EXTRA_LANGUAGE, mLocale.getLanguage())
                 .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
 
         if (overrideLanguage != null && !overrideLanguage.isEmpty()) {
@@ -314,8 +315,8 @@ public class Speech {
         return mIsListening;
     }
 
-    public void setTextToSpeechLocale(Locale locale) {
-        mTtsLocale = locale;
+    public void setLocale(Locale locale) {
+        mLocale = locale;
     }
 
     public void setTextToSpeechRate(float rate) {
@@ -331,7 +332,7 @@ public class Speech {
     }
 
     public void say(String message) {
-        mTextToSpeech.setLanguage(mTtsLocale);
+        mTextToSpeech.setLanguage(mLocale);
         mTextToSpeech.setPitch(mTtsPitch);
         mTextToSpeech.setSpeechRate(mTtsRate);
 

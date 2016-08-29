@@ -114,7 +114,7 @@ public class Speech {
     private TextToSpeech mTextToSpeech;
     private Locale mTtsLocale = Locale.getDefault();
     private float mTtsRate = 1.0f;
-    private float mTtsPitch = 1.3f;
+    private float mTtsPitch = 1.0f;
     private long mForceStopDelayInMs = 2000;
 
     private Speech(Context context) {
@@ -131,8 +131,13 @@ public class Speech {
             throw new IllegalArgumentException("context must be defined!");
 
         mContext = context;
-        mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(context);
-        mSpeechRecognizer.setRecognitionListener(mListener);
+
+        if (SpeechRecognizer.isRecognitionAvailable(context)) {
+            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(context);
+            mSpeechRecognizer.setRecognitionListener(mListener);
+        } else {
+            mSpeechRecognizer = null;
+        }
 
         mTextToSpeech = new TextToSpeech(context, new TextToSpeech.OnInitListener() {
             @Override
@@ -219,8 +224,11 @@ public class Speech {
 
     /**
      * Starts voice recognition with the device default language.
+     *
+     * @throws SpeechRecognitionNotAvailable when speech recognition is not available on the device
      */
-    public void startListening(SpeechDelegate delegate) {
+    public void startListening(SpeechDelegate delegate)
+        throws SpeechRecognitionNotAvailable {
         startListening(delegate, null);
     }
 
@@ -228,8 +236,15 @@ public class Speech {
      * Starts voice recognition with a custom recognition language.
      * @param overrideLanguage custom recognition language in the form of "en-US". Null to use
      *                         the device default language
+     * @throws SpeechRecognitionNotAvailable when speech recognition is not available on the device
      */
-    public void startListening(SpeechDelegate delegate, String overrideLanguage) {
+    public void startListening(SpeechDelegate delegate, String overrideLanguage)
+            throws SpeechRecognitionNotAvailable{
+        if (mIsListening) return;
+
+        if (mSpeechRecognizer == null)
+            throw new SpeechRecognitionNotAvailable();
+
         if (delegate == null)
             throw new IllegalArgumentException("delegate must be defined!");
 
@@ -259,6 +274,8 @@ public class Speech {
     }
 
     public void stopListening() {
+        if (!mIsListening) return;
+
         mIsListening = false;
         mSpeechRecognizer.stopListening();
 

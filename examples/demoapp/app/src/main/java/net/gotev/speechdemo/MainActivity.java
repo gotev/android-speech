@@ -14,6 +14,7 @@ import net.gotev.speech.DelayedOperation;
 import net.gotev.speech.Speech;
 import net.gotev.speech.SpeechDelegate;
 import net.gotev.speech.SpeechRecognitionException;
+import net.gotev.speech.SpeechRecognitionNotAvailable;
 import net.gotev.toyproject.R;
 
 import java.util.List;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
 
         text = (TextView) findViewById(R.id.text);
 
-        delayedStopListening = new DelayedOperation(this, "delayStopListen", 2000);
+        delayedStopListening = new DelayedOperation(this, "delayStopListen", 1500);
     }
 
     private void onButtonClick() {
@@ -49,22 +50,30 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
                     .request(Manifest.permission.RECORD_AUDIO)
                     .subscribe(granted -> {
                         if (granted) { // Always true pre-M
-                            Speech.getInstance().startListening(MainActivity.this);
-                            delayedStopListening.start(new DelayedOperation.Operation() {
-                                @Override
-                                public void onDelayedOperation() {
-                                    Speech.getInstance().stopListening();
-                                }
-
-                                @Override
-                                public boolean shouldExecuteDelayedOperation() {
-                                    return true;
-                                }
-                            });
+                            onRecordAudioPermissionGranted();
                         } else {
                             Toast.makeText(MainActivity.this, "You need to grant permission", Toast.LENGTH_LONG);
                         }
                     });
+        }
+    }
+
+    private void onRecordAudioPermissionGranted() {
+        try {
+            Speech.getInstance().startListening(MainActivity.this);
+            delayedStopListening.start(new DelayedOperation.Operation() {
+                @Override
+                public void onDelayedOperation() {
+                    Speech.getInstance().stopListening();
+                }
+
+                @Override
+                public boolean shouldExecuteDelayedOperation() {
+                    return true;
+                }
+            });
+        } catch (SpeechRecognitionNotAvailable exc) {
+            Toast.makeText(this, "Speech recognition is not available on this device!", Toast.LENGTH_LONG).show();
         }
     }
 

@@ -325,4 +325,10 @@ public class Speech {
         }
     }
 
+    public void stopTextToSpeech() {
+        if (mTextToSpeech != null) {
+            mTextToSpeech.stop();
+        }
+    }
+
 }

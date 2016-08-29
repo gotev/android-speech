@@ -12,12 +12,13 @@ import com.tbruyelle.rxpermissions.RxPermissions;
 
 import net.gotev.speech.DelayedOperation;
 import net.gotev.speech.Speech;
+import net.gotev.speech.SpeechDelegate;
 import net.gotev.speech.SpeechRecognitionException;
 import net.gotev.toyproject.R;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements Speech.Delegate {
+public class MainActivity extends AppCompatActivity implements SpeechDelegate {
 
     private Button button;
     private Button speak;
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity implements Speech.Delegate {
     }
 
     private void onSpeakClick() {
-        Speech.getInstance().say("Ciao, io sono la tua assistente");
+        Speech.getInstance().say(getString(R.string.demo_tts));
     }
 
     @Override
@@ -95,13 +96,13 @@ public class MainActivity extends AppCompatActivity implements Speech.Delegate {
     @Override
     public void onStartOfSpeech() {
         Log.i(getClass().getSimpleName(), "Speech recognition started");
-        button.setText("Stop");
+        button.setText(getString(R.string.stop_listening));
     }
 
     @Override
     public void onEndOfSpeech() {
         Log.i(getClass().getSimpleName(), "Speech recognition ended");
-        button.setText("Recognize");
+        button.setText(getString(R.string.start_listening));
     }
 
     @Override

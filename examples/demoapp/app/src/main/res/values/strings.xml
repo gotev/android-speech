@@ -1,3 +1,8 @@
 <resources>
-    <string name="app_name">ToyProject</string>
+    <string name="app_name">Speech Demo</string>
+    <string name="start_listening">Start listening</string>
+    <string name="stop_listening">Stop listening</string>
+    <string name="say_something">Say something</string>
+    <string name="introduction">Tap on one of the buttons to try an action</string>
+    <string name="demo_tts">Ciao, sono la tua assistente</string>
 </resources>

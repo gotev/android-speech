@@ -123,8 +123,8 @@ public class Speech {
     private float mTtsPitch = 1.0f;
     private long mForceStopDelayInMs = 2000;
     private long mStopListeningDelayInMs = 3000;
-    private long mMinimumStartStopDelay = 1000;
-    private long mStartTimestamp;
+    private long mTransitionMinimumDelay = 1200;
+    private long mLastActionTimestamp;
 
     private Speech(Context context) {
         commonInitializer(context);
@@ -265,6 +265,11 @@ public class Speech {
         if (delegate == null)
             throw new IllegalArgumentException("delegate must be defined!");
 
+        if (throttleAction()) {
+            Log.d(getClass().getSimpleName(), "Hey man calm down! Throttling start to prevent disaster!");
+            return;
+        }
+
         mDelegate = delegate;
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -287,7 +292,7 @@ public class Speech {
 
         mSpeechRecognizer.startListening(intent);
         mIsListening = true;
-        mStartTimestamp = new Date().getTime();
+        updateLastActionTimestamp();
         mDelegate.onStartOfSpeech();
 
         mDelayedStopListening.start(new DelayedOperation.Operation() {
@@ -304,6 +309,14 @@ public class Speech {
 
     }
 
+    private void updateLastActionTimestamp() {
+        mLastActionTimestamp = new Date().getTime();
+    }
+
+    private boolean throttleAction() {
+        return (new Date().getTime() <= (mLastActionTimestamp + mTransitionMinimumDelay));
+    }
+
     /**
      * Stops voice recognition listening.
      * This method does nothing if voice listening is not active
@@ -311,12 +324,13 @@ public class Speech {
     public void stopListening() {
         if (!mIsListening) return;
 
-        if (new Date().getTime() <= (mStartTimestamp + mMinimumStartStopDelay)) {
+        if (throttleAction()) {
             Log.d(getClass().getSimpleName(), "Hey man calm down! Throttling stop to prevent disaster!");
             return;
         }
 
         mIsListening = false;
+        updateLastActionTimestamp();
         mSpeechRecognizer.stopListening();
 
         mDelayedForceStop.start(new DelayedOperation.Operation() {
@@ -432,8 +446,8 @@ public class Speech {
         return this;
     }
 
-    public Speech setMinimumStartStopDelay(long milliseconds) {
-        mMinimumStartStopDelay = milliseconds;
+    public Speech setTransitionMinimumDelay(long milliseconds) {
+        mTransitionMinimumDelay = milliseconds;
         return this;
     }
 

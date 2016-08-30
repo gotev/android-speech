@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="Android Speech : Android speech recognition and text to speech made easy">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Android Speech</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/gotev/android-speech">View on GitHub</a>
+
+          <h1 id="project_title">Android Speech</h1>
+          <h2 id="project_tagline">Android speech recognition and text to speech made easy</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/gotev/android-speech/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/gotev/android-speech/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p><a href="https://travis-ci.org/gotev/android-speech"><img src="https://travis-ci.org/gotev/android-speech.svg?branch=master" alt="Build Status"></a> <a href="https://bintray.com/gotev/maven/android-speech/_latestVersion"> <img src="https://api.bintray.com/packages/gotev/maven/android-speech/images/download.svg" alt="Download"> </a></p>
+
+<h2>
+<a id="setup" class="anchor" href="#setup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Setup</h2>
+
+<h3>
+<a id="gradle" class="anchor" href="#gradle" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Gradle</h3>
+
+<pre><code>dependencies {
+    compile 'net.gotev:speech:1.0'
+}
+</code></pre>
+
+<h3>
+<a id="maven" class="anchor" href="#maven" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Maven</h3>
+
+<pre><code>&lt;dependency&gt;
+  &lt;groupId&gt;net.gotev&lt;/groupId&gt;
+  &lt;artifactId&gt;speech&lt;/artifactId&gt;
+  &lt;version&gt;1.0&lt;/version&gt;
+  &lt;type&gt;aar&lt;/type&gt;
+&lt;/dependency&gt;
+</code></pre>
+
+<h2>
+<a id="initialization" class="anchor" href="#initialization" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Initialization</h2>
+
+<p>To start using the library, you have to initialize it in your <a href="http://developer.android.com/reference/android/app/Application.html">Application subclass</a>:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-k">public</span> <span class="pl-k">class</span> <span class="pl-en">Initializer</span> <span class="pl-k">extends</span> <span class="pl-e">Application</span> {
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onCreate</span>() {
+        <span class="pl-v">super</span><span class="pl-k">.</span>onCreate();
+
+        <span class="pl-smi">Speech</span><span class="pl-k">.</span>init(<span class="pl-v">this</span>);
+    }
+}</pre></div>
+
+<h2>
+<a id="logging" class="anchor" href="#logging" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Logging</h2>
+
+<p>By default the library logging is disabled. You can enable debug log by invoking:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">Logger</span><span class="pl-k">.</span>setLogLevel(<span class="pl-smi">LogLevel</span><span class="pl-c1"><span class="pl-k">.</span>DEBUG</span>);</pre></div>
+
+<p>wherever you want in your code. You can adjust the level of detail from DEBUG to OFF.</p>
+
+<p>The library logger uses <code>android.util.Log</code> by default, so you will get the output in <code>LogCat</code>. If you want to redirect logs to different output or use a different logger, you can provide your own delegate implementation like this:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">Logger</span><span class="pl-k">.</span>setLoggerDelegate(<span class="pl-k">new</span> <span class="pl-smi">Logger</span>.<span class="pl-smi">LoggerDelegate</span>() {
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">error</span>(<span class="pl-smi">String</span> <span class="pl-v">tag</span>, <span class="pl-smi">String</span> <span class="pl-v">message</span>) {
+        <span class="pl-c">//your own implementation here</span>
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">error</span>(<span class="pl-smi">String</span> <span class="pl-v">tag</span>, <span class="pl-smi">String</span> <span class="pl-v">message</span>, <span class="pl-smi">Throwable</span> <span class="pl-v">exception</span>) {
+        <span class="pl-c">//your own implementation here</span>
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">debug</span>(<span class="pl-smi">String</span> <span class="pl-v">tag</span>, <span class="pl-smi">String</span> <span class="pl-v">message</span>) {
+        <span class="pl-c">//your own implementation here</span>
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">info</span>(<span class="pl-smi">String</span> <span class="pl-v">tag</span>, <span class="pl-smi">String</span> <span class="pl-v">message</span>) {
+        <span class="pl-c">//your own implementation here</span>
+    }
+});</pre></div>
+
+<h2>
+<a id="example" class="anchor" href="#example" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Example</h2>
+
+<p>You can find a fully working demo app which uses this library in the <code>examples</code> directory. Just checkout the project and give it a try.</p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<h3>
+<a id="speech-recognition" class="anchor" href="#speech-recognition" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Speech recognition</h3>
+
+<p>Inside an activity:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-k">try</span> {
+    <span class="pl-c">// you must have android.permission.RECORD_AUDIO granted at this point</span>
+    <span class="pl-smi">Speech</span><span class="pl-k">.</span>getInstance()<span class="pl-k">.</span>startListening(<span class="pl-k">new</span> <span class="pl-smi">SpeechDelegate</span>() {
+        <span class="pl-k">@Override</span>
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onStartOfSpeech</span>() {
+            <span class="pl-smi">Log</span><span class="pl-k">.</span>i(<span class="pl-s"><span class="pl-pds">"</span>speech<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>speech recognition is now active<span class="pl-pds">"</span></span>);
+        }
+
+        <span class="pl-k">@Override</span>
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onSpeechRmsChanged</span>(<span class="pl-k">float</span> <span class="pl-v">value</span>) {
+            <span class="pl-smi">Log</span><span class="pl-k">.</span>d(<span class="pl-s"><span class="pl-pds">"</span>speech<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>rms is now: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> value);
+        }
+
+        <span class="pl-k">@Override</span>
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onSpeechPartialResults</span>(<span class="pl-k">List&lt;<span class="pl-smi">String</span>&gt;</span> <span class="pl-v">results</span>) {
+            <span class="pl-smi">StringBuilder</span> str <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-smi">StringBuilder</span>();
+            <span class="pl-k">for</span> (<span class="pl-smi">String</span> res <span class="pl-k">:</span> results) {
+                str<span class="pl-k">.</span>append(res)<span class="pl-k">.</span>append(<span class="pl-s"><span class="pl-pds">"</span> <span class="pl-pds">"</span></span>);
+            }
+
+            <span class="pl-smi">Log</span><span class="pl-k">.</span>i(<span class="pl-s"><span class="pl-pds">"</span>speech<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>partial result: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> str<span class="pl-k">.</span>toString()<span class="pl-k">.</span>trim());
+        }
+
+        <span class="pl-k">@Override</span>
+        <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onSpeechResult</span>(<span class="pl-smi">String</span> <span class="pl-v">result</span>) {
+            <span class="pl-smi">Log</span><span class="pl-k">.</span>i(<span class="pl-s"><span class="pl-pds">"</span>speech<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>result: <span class="pl-pds">"</span></span> <span class="pl-k">+</span> result);
+        }
+    });
+} <span class="pl-k">catch</span> (<span class="pl-smi">SpeechRecognitionNotAvailable</span> exc) {
+    <span class="pl-smi">Log</span><span class="pl-k">.</span>e(<span class="pl-s"><span class="pl-pds">"</span>speech<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>Speech recognition is not available on this device!<span class="pl-pds">"</span></span>);
+    <span class="pl-c">// You can prompt the user if he wants to install Google App to have</span>
+    <span class="pl-c">// speech recognition, and then you can simply call:</span>
+    <span class="pl-c">//</span>
+    <span class="pl-c">// SpeechUtil.redirectUserToGoogleAppOnPlayStore(this);</span>
+    <span class="pl-c">//</span>
+    <span class="pl-c">// to redirect the user to the Google App page on Play Store</span>
+}</pre></div>
+
+<h3>
+<a id="text-to-speech" class="anchor" href="#text-to-speech" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Text to speech</h3>
+
+<p>Inside an activity:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">Speech</span><span class="pl-k">.</span>getInstance()<span class="pl-k">.</span>say(<span class="pl-s"><span class="pl-pds">"</span>say something<span class="pl-pds">"</span></span>);</pre></div>
+
+<p>You can also provide a callback to receive status:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">Speech</span><span class="pl-k">.</span>getInstance()<span class="pl-k">.</span>say(<span class="pl-s"><span class="pl-pds">"</span>say something<span class="pl-pds">"</span></span>, <span class="pl-k">new</span> <span class="pl-smi">TextToSpeechCallback</span>() {
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onStart</span>() {
+        <span class="pl-smi">Log</span><span class="pl-k">.</span>i(<span class="pl-s"><span class="pl-pds">"</span>speech<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>speech started<span class="pl-pds">"</span></span>);
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onCompleted</span>() {
+        <span class="pl-smi">Log</span><span class="pl-k">.</span>i(<span class="pl-s"><span class="pl-pds">"</span>speech<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>speech completed<span class="pl-pds">"</span></span>);
+    }
+
+    <span class="pl-k">@Override</span>
+    <span class="pl-k">public</span> <span class="pl-k">void</span> <span class="pl-en">onError</span>() {
+        <span class="pl-smi">Log</span><span class="pl-k">.</span>i(<span class="pl-s"><span class="pl-pds">"</span>speech<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>speech error<span class="pl-pds">"</span></span>);
+    }
+});</pre></div>
+
+<h2>
+<a id="configuration" class="anchor" href="#configuration" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Configuration</h2>
+
+<p>You can configure various parameters by using the setter methods on the speech instance, which you can get like this anywhere in your code:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">Speech</span><span class="pl-k">.</span>getInstance()</pre></div>
+
+<p>Refer to JavaDocs for a complete reference.</p>
+
+<h2>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
+
+<pre><code>Copyright (C) 2016 Aleksandar Gotev
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+</code></pre>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Android Speech maintained by <a href="https://github.com/gotev">gotev</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>

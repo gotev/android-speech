@@ -6,10 +6,13 @@ import android.net.Uri;
 
 /**
  * Utility methods.
- * 
+ *
  * @author Aleksandar Gotev
  */
 public class SpeechUtil {
+
+    // private constructor to avoid instantiation
+    private SpeechUtil() {}
 
     /**
      * Opens the Google App page on Play Store

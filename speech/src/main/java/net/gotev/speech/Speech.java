@@ -457,27 +457,58 @@ public class Speech {
         return this;
     }
 
+    /**
+     * Sets text to speech and recognition language.
+     * Defaults to device language setting.
+     * @param locale new locale
+     * @return speech instance
+     */
     public Speech setLocale(Locale locale) {
         mLocale = locale;
         return this;
     }
 
+    /**
+     * Sets the speech rate. This has no effect on any pre-recorded speech.
+     * @param rate  Speech rate. 1.0 is the normal speech rate, lower values slow down the speech
+     *              (0.5 is half the normal speech rate), greater values accelerate it
+     *              (2.0 is twice the normal speech rate).
+     * @return speech instance
+     */
     public Speech setTextToSpeechRate(float rate) {
         mTtsRate = rate;
         return this;
     }
 
+    /**
+     * Sets the speech pitch for the TextToSpeech engine.
+     * This has no effect on any pre-recorded speech.
+     * @param pitch Speech pitch. 1.0 is the normal pitch, lower values lower the tone of the
+     *              synthesized voice, greater values increase it.
+     * @return speech instance
+     */
     public Speech setTextToSpeechPitch(float pitch) {
         mTtsPitch = pitch;
         return this;
     }
 
+    /**
+     * Sets the idle timeout after which the listening will be automatically stopped.
+     * @param milliseconds timeout in milliseconds
+     * @return speech instance
+     */
     public Speech setStopListeningAfterInactivity(long milliseconds) {
         mStopListeningDelayInMs = milliseconds;
         initDelayedStopListening(mContext);
         return this;
     }
 
+    /**
+     * Sets the minimum interval between start/stop events. This is useful to prevent
+     * monkey input from users.
+     * @param milliseconds minimum interval betweeb state change in milliseconds
+     * @return speech instance
+     */
     public Speech setTransitionMinimumDelay(long milliseconds) {
         mTransitionMinimumDelay = milliseconds;
         return this;

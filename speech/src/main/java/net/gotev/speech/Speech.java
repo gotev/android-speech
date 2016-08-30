@@ -297,24 +297,11 @@ public class Speech {
     }
 
     /**
-     * Starts voice recognition with the device default language.
-     *
+     * Starts voice recognition.
      * @param delegate delegate which will receive speech recognition events and status
      * @throws SpeechRecognitionNotAvailable when speech recognition is not available on the device
      */
     public void startListening(SpeechDelegate delegate)
-        throws SpeechRecognitionNotAvailable {
-        startListening(delegate, null);
-    }
-
-    /**
-     * Starts voice recognition with a custom recognition language.
-     * @param delegate delegate which will receive speech recognition events and status
-     * @param overrideLanguage custom recognition language in the form of "en-US". Null to use
-     *                         the device default language
-     * @throws SpeechRecognitionNotAvailable when speech recognition is not available on the device
-     */
-    public void startListening(SpeechDelegate delegate, String overrideLanguage)
             throws SpeechRecognitionNotAvailable{
         if (mIsListening) return;
 
@@ -336,10 +323,6 @@ public class Speech {
                 .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, mGetPartialResults)
                 .putExtra(RecognizerIntent.EXTRA_LANGUAGE, mLocale.getLanguage())
                 .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-
-        if (overrideLanguage != null && !overrideLanguage.isEmpty()) {
-            intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, overrideLanguage);
-        }
 
         if (mCallingPackage != null && !mCallingPackage.isEmpty()) {
             intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, mCallingPackage);

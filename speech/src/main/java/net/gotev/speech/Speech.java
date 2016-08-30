@@ -4,15 +4,20 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * Helper class to easily work with Android speech recognition.
@@ -39,6 +44,7 @@ public class Speech {
     private Context mContext;
 
     private TextToSpeech mTextToSpeech;
+    private Map<String, TextToSpeechCallback> mTtsCallbacks = new HashMap<>();
     private Locale mLocale = Locale.getDefault();
     private float mTtsRate = 1.0f;
     private float mTtsPitch = 1.0f;
@@ -61,6 +67,52 @@ public class Speech {
                 default:
                     Logger.error(LOG_TAG, "Unknown TextToSpeech status: " + status);
                     break;
+            }
+        }
+    };
+
+    private UtteranceProgressListener mTtsProgressListener = new UtteranceProgressListener() {
+        @Override
+        public void onStart(final String utteranceId) {
+            final TextToSpeechCallback callback = mTtsCallbacks.get(utteranceId);
+
+            if (callback != null) {
+                new Handler(mContext.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onStart();
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void onDone(final String utteranceId) {
+            final TextToSpeechCallback callback = mTtsCallbacks.get(utteranceId);
+
+            if (callback != null) {
+                new Handler(mContext.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onCompleted();
+                        mTtsCallbacks.remove(utteranceId);
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void onError(final String utteranceId) {
+            final TextToSpeechCallback callback = mTtsCallbacks.get(utteranceId);
+
+            if (callback != null) {
+                new Handler(mContext.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        callback.onError();
+                        mTtsCallbacks.remove(utteranceId);
+                    }
+                });
             }
         }
     };
@@ -167,6 +219,7 @@ public class Speech {
 
         if (mTextToSpeech == null) {
             mTextToSpeech = new TextToSpeech(context, mTttsInitListener);
+            mTextToSpeech.setOnUtteranceProgressListener(mTtsProgressListener);
         }
 
         if (SpeechRecognizer.isRecognitionAvailable(context)) {
@@ -362,14 +415,31 @@ public class Speech {
      * @param message message to play
      */
     public void say(String message) {
+        say(message, null);
+    }
+
+    /**
+     * Uses text to speech to transform a written message into a sound.
+     * @param message message to play
+     * @param callback callback which will receive progress status of the operation
+     */
+    public void say(String message, TextToSpeechCallback callback) {
         mTextToSpeech.setLanguage(mLocale);
         mTextToSpeech.setPitch(mTtsPitch);
         mTextToSpeech.setSpeechRate(mTtsRate);
 
+        String utteranceId = UUID.randomUUID().toString();
+
+        if (callback != null) {
+            mTtsCallbacks.put(utteranceId, callback);
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mTextToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null, null);
+            mTextToSpeech.speak(message, TextToSpeech.QUEUE_ADD, null, utteranceId);
         } else {
-            mTextToSpeech.speak(message, TextToSpeech.QUEUE_FLUSH, null);
+            HashMap<String, String> params = new HashMap<>();
+            params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId);
+            mTextToSpeech.speak(message, TextToSpeech.QUEUE_ADD, params);
         }
     }
 

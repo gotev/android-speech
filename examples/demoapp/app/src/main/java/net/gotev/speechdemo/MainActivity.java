@@ -13,6 +13,7 @@ import com.tbruyelle.rxpermissions.RxPermissions;
 import net.gotev.speech.Speech;
 import net.gotev.speech.SpeechDelegate;
 import net.gotev.speech.SpeechRecognitionNotAvailable;
+import net.gotev.speech.TextToSpeechCallback;
 import net.gotev.toyproject.R;
 
 import java.util.List;
@@ -55,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
 
     private void onRecordAudioPermissionGranted() {
         try {
+            Speech.getInstance().stopTextToSpeech();
             Speech.getInstance().startListening(MainActivity.this);
         } catch (SpeechRecognitionNotAvailable exc) {
             Toast.makeText(this, "Speech recognition is not available on this device!", Toast.LENGTH_LONG).show();
@@ -62,7 +64,22 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
     }
 
     private void onSpeakClick() {
-        Speech.getInstance().say(getString(R.string.demo_tts));
+        Speech.getInstance().say(getString(R.string.demo_tts), new TextToSpeechCallback() {
+            @Override
+            public void onStart() {
+                Toast.makeText(MainActivity.this, "onStart", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onCompleted() {
+                Toast.makeText(MainActivity.this, "onCompleted", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError() {
+                Toast.makeText(MainActivity.this, "onError", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -75,10 +92,13 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         button.setText(getString(R.string.start_listening));
         Log.i(getClass().getSimpleName(), "onSpeechResult");
         text.setText("Result: " + result);
-        if (result.isEmpty())
+
+        if (result.isEmpty()) {
             Speech.getInstance().say("Ripeti per favore");
-        else
+
+        } else {
             Speech.getInstance().say(result);
+        }
     }
 
     @Override

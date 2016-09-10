@@ -521,4 +521,12 @@ public class Speech {
     public void setmSpeechRecognizer(SpeechRecognizer mSpeechRecognizer) {
         this.mSpeechRecognizer = mSpeechRecognizer;
     }
+
+    public RecognitionListener getmListener() {
+        return mListener;
+    }
+
+    public void setmListener(RecognitionListener mListener) {
+        this.mListener = mListener;
+    }
 }

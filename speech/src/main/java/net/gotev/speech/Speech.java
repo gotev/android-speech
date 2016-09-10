@@ -29,6 +29,7 @@ public class Speech {
     private static final String LOG_TAG = Speech.class.getSimpleName();
 
     private static Speech instance = null;
+    private Intent intent;
 
     private SpeechRecognizer mSpeechRecognizer;
     private String mCallingPackage;
@@ -318,7 +319,7 @@ public class Speech {
 
         mDelegate = delegate;
 
-        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+        intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
                 .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
                 .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, mGetPartialResults)
                 .putExtra(RecognizerIntent.EXTRA_LANGUAGE, mLocale.getLanguage())
@@ -528,5 +529,13 @@ public class Speech {
 
     public void setmListener(RecognitionListener mListener) {
         this.mListener = mListener;
+    }
+
+    public Intent getIntent() {
+        return intent;
+    }
+
+    public void setIntent(Intent intent) {
+        this.intent = intent;
     }
 }

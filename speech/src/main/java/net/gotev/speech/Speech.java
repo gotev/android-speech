@@ -219,24 +219,21 @@ public class Speech {
     };
 
     private Speech(Context context) {
-        commonInitializer(context);
+        initSpeechRecognizer(context);
+        initTts(context);
     }
 
     private Speech(Context context, String callingPackage) {
-        commonInitializer(context);
+        initSpeechRecognizer(context);
+        initTts(context);
         mCallingPackage = callingPackage;
     }
 
-    private void commonInitializer(Context context) {
+    private void initSpeechRecognizer(Context context) {
         if (context == null)
             throw new IllegalArgumentException("context must be defined!");
 
         mContext = context;
-
-        if (mTextToSpeech == null) {
-            mTextToSpeech = new TextToSpeech(context, mTttsInitListener);
-            mTextToSpeech.setOnUtteranceProgressListener(mTtsProgressListener);
-        }
 
         if (SpeechRecognizer.isRecognitionAvailable(context)) {
             if (mSpeechRecognizer != null) {
@@ -253,6 +250,16 @@ public class Speech {
 
         mPartialData.clear();
         mUnstableData = null;
+    }
+
+    private void initTts(Context context) {
+        if (mTextToSpeech == null) {
+            mTextToSpeech = new TextToSpeech(context, mTttsInitListener);
+            mTextToSpeech.setOnUtteranceProgressListener(mTtsProgressListener);
+            mTextToSpeech.setLanguage(mLocale);
+            mTextToSpeech.setPitch(mTtsPitch);
+            mTextToSpeech.setSpeechRate(mTtsRate);
+        }
     }
 
     private void initDelayedStopListening(Context context) {
@@ -409,7 +416,7 @@ public class Speech {
         }
 
         // recreate the speech recognizer
-        commonInitializer(mContext);
+        initSpeechRecognizer(mContext);
     }
 
     /**
@@ -434,10 +441,6 @@ public class Speech {
      * @param callback callback which will receive progress status of the operation
      */
     public void say(String message, TextToSpeechCallback callback) {
-        mTextToSpeech.setLanguage(mLocale);
-        mTextToSpeech.setPitch(mTtsPitch);
-        mTextToSpeech.setSpeechRate(mTtsRate);
-
         String utteranceId = UUID.randomUUID().toString();
 
         if (callback != null) {
@@ -492,6 +495,7 @@ public class Speech {
      */
     public Speech setLocale(Locale locale) {
         mLocale = locale;
+        mTextToSpeech.setLanguage(mLocale);
         return this;
     }
 
@@ -504,6 +508,7 @@ public class Speech {
      */
     public Speech setTextToSpeechRate(float rate) {
         mTtsRate = rate;
+        mTextToSpeech.setSpeechRate(mTtsRate);
         return this;
     }
 
@@ -516,6 +521,7 @@ public class Speech {
      */
     public Speech setTextToSpeechPitch(float pitch) {
         mTtsPitch = pitch;
+        mTextToSpeech.setPitch(mTtsPitch);
         return this;
     }
 

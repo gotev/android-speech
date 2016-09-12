@@ -142,7 +142,12 @@ public class Speech {
 
         @Override
         public void onRmsChanged(float v) {
-            mDelegate.onSpeechRmsChanged(v);
+            try {
+                mDelegate.onSpeechRmsChanged(v);
+            } catch (Throwable exc) {
+                Logger.error(Speech.class.getSimpleName(),
+                        "Unhandled exception in delegate onSpeechRmsChanged", exc);
+            }
         }
 
         @Override
@@ -157,7 +162,12 @@ public class Speech {
                 mPartialData.addAll(partialResults);
                 mUnstableData = unstableData != null && !unstableData.isEmpty()
                         ? unstableData.get(0) : null;
-                mDelegate.onSpeechPartialResults(partialResults);
+                try {
+                    mDelegate.onSpeechPartialResults(partialResults);
+                } catch (Throwable exc) {
+                    Logger.error(Speech.class.getSimpleName(),
+                            "Unhandled exception in delegate onSpeechPartialResults", exc);
+                }
             }
         }
 
@@ -178,7 +188,13 @@ public class Speech {
             }
 
             mIsListening = false;
-            mDelegate.onSpeechResult(result);
+
+            try {
+                mDelegate.onSpeechResult(result.trim());
+            } catch (Throwable exc) {
+                Logger.error(Speech.class.getSimpleName(),
+                        "Unhandled exception in delegate onSpeechResult", exc);
+            }
         }
 
         @Override
@@ -335,7 +351,13 @@ public class Speech {
         mSpeechRecognizer.startListening(intent);
         mIsListening = true;
         updateLastActionTimestamp();
-        mDelegate.onStartOfSpeech();
+
+        try {
+            mDelegate.onStartOfSpeech();
+        } catch (Throwable exc) {
+            Logger.error(Speech.class.getSimpleName(),
+                    "Unhandled exception in delegate onStartOfSpeech", exc);
+        }
 
     }
 
@@ -374,12 +396,17 @@ public class Speech {
         if (mUnstableData != null && !mUnstableData.isEmpty())
             out.append(mUnstableData);
 
-        return out.toString();
+        return out.toString().trim();
     }
 
     private void returnPartialResultsAndRecreateSpeechRecognizer() {
         mIsListening = false;
-        mDelegate.onSpeechResult(getPartialResultsAsString());
+        try {
+            mDelegate.onSpeechResult(getPartialResultsAsString());
+        } catch (Throwable exc) {
+            Logger.error(Speech.class.getSimpleName(),
+                    "Unhandled exception in delegate onSpeechResult", exc);
+        }
 
         // recreate the speech recognizer
         commonInitializer(mContext);

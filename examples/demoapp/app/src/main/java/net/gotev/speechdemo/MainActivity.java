@@ -14,6 +14,7 @@ import net.gotev.speech.Speech;
 import net.gotev.speech.SpeechDelegate;
 import net.gotev.speech.SpeechRecognitionNotAvailable;
 import net.gotev.speech.TextToSpeechCallback;
+import net.gotev.speech.ui.SpeechProgressView;
 import net.gotev.toyproject.R;
 
 import java.util.List;
@@ -23,6 +24,7 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
     private Button button;
     private Button speak;
     private TextView text;
+    private SpeechProgressView progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +38,7 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         speak.setOnClickListener(view -> onSpeakClick());
 
         text = (TextView) findViewById(R.id.text);
+        progress = (SpeechProgressView) findViewById(R.id.progress);
     }
 
     private void onButtonClick() {
@@ -57,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
     private void onRecordAudioPermissionGranted() {
         try {
             Speech.getInstance().stopTextToSpeech();
-            Speech.getInstance().startListening(MainActivity.this);
+            Speech.getInstance().startListening(progress, MainActivity.this);
         } catch (SpeechRecognitionNotAvailable exc) {
             Toast.makeText(this, "Speech recognition is not available on this device!", Toast.LENGTH_LONG).show();
         }

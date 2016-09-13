@@ -11,6 +11,8 @@ import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 
+import net.gotev.speech.ui.SpeechProgressView;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,6 +33,7 @@ public class Speech {
     private static Speech instance = null;
 
     private SpeechRecognizer mSpeechRecognizer;
+    private SpeechProgressView mProgressView;
     private String mCallingPackage;
     private boolean mPreferOffline = false;
     private boolean mGetPartialResults = true;
@@ -48,7 +51,7 @@ public class Speech {
     private Locale mLocale = Locale.getDefault();
     private float mTtsRate = 1.0f;
     private float mTtsPitch = 1.0f;
-    private long mStopListeningDelayInMs = 1400;
+    private long mStopListeningDelayInMs = 4000;
     private long mTransitionMinimumDelay = 1200;
     private long mLastActionTimestamp;
 
@@ -127,6 +130,9 @@ public class Speech {
 
         @Override
         public void onBeginningOfSpeech() {
+            if (mProgressView != null)
+                mProgressView.onBeginningOfSpeech();
+
             mDelayedStopListening.start(new DelayedOperation.Operation() {
                 @Override
                 public void onDelayedOperation() {
@@ -148,6 +154,9 @@ public class Speech {
                 Logger.error(Speech.class.getSimpleName(),
                         "Unhandled exception in delegate onSpeechRmsChanged", exc);
             }
+
+            if (mProgressView != null)
+                mProgressView.onRmsChanged(v);
         }
 
         @Override
@@ -195,6 +204,11 @@ public class Speech {
                 Logger.error(Speech.class.getSimpleName(),
                         "Unhandled exception in delegate onSpeechResult", exc);
             }
+
+            if (mProgressView != null)
+                mProgressView.onResultOrOnError();
+
+            initSpeechRecognizer(mContext);
         }
 
         @Override
@@ -210,6 +224,8 @@ public class Speech {
 
         @Override
         public void onEndOfSpeech() {
+            if (mProgressView != null)
+                mProgressView.onEndOfSpeech();
         }
 
         @Override
@@ -324,7 +340,17 @@ public class Speech {
      * @param delegate delegate which will receive speech recognition events and status
      * @throws SpeechRecognitionNotAvailable when speech recognition is not available on the device
      */
-    public void startListening(SpeechDelegate delegate)
+    public void startListening(SpeechDelegate delegate) throws SpeechRecognitionNotAvailable {
+        startListening(null, delegate);
+    }
+
+    /**
+     * Starts voice recognition.
+     * @param progressView view in which to draw speech animation
+     * @param delegate delegate which will receive speech recognition events and status
+     * @throws SpeechRecognitionNotAvailable when speech recognition is not available on the device
+     */
+    public void startListening(SpeechProgressView progressView, SpeechDelegate delegate)
             throws SpeechRecognitionNotAvailable{
         if (mIsListening) return;
 
@@ -339,6 +365,7 @@ public class Speech {
             return;
         }
 
+        mProgressView = progressView;
         mDelegate = delegate;
 
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
@@ -414,6 +441,9 @@ public class Speech {
             Logger.error(Speech.class.getSimpleName(),
                     "Unhandled exception in delegate onSpeechResult", exc);
         }
+
+        if (mProgressView != null)
+            mProgressView.onResultOrOnError();
 
         // recreate the speech recognizer
         initSpeechRecognizer(mContext);

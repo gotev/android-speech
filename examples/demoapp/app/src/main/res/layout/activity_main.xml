@@ -13,14 +13,24 @@
         android:id="@+id/text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/introduction" />
+        android:text="@string/introduction"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true" />
+
+    <net.gotev.speech.ui.SpeechProgressView
+        android:id="@+id/progress"
+        android:background="@android:color/holo_blue_light"
+        android:layout_width="200dp"
+        android:layout_height="150dp"
+        android:layout_above="@+id/button"
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/start_listening"
         android:id="@+id/button"
-        android:layout_centerVertical="true"
+        android:layout_above="@+id/speak"
         android:layout_centerHorizontal="true" />
 
     <Button
@@ -28,6 +38,6 @@
         android:layout_height="wrap_content"
         android:text="@string/say_something"
         android:id="@+id/speak"
-        android:layout_below="@+id/button"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true" />
 </RelativeLayout>

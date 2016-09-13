@@ -145,6 +145,9 @@ Speech.getInstance()
 ```
 Refer to JavaDocs for a complete reference.
 
+## Credits
+Thanks to @zagum for the original implementation of the [speech recognition view](https://github.com/zagum/SpeechRecognitionView).
+
 ## License
 
     Copyright (C) 2016 Aleksandar Gotev

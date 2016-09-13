@@ -112,6 +112,49 @@ try {
 }
 ```
 
+### Display progress animation
+Add this to your layout:
+```xml
+<LinearLayout
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:id="@+id/linearLayout">
+
+    <net.gotev.speech.ui.SpeechProgressView
+        android:id="@+id/progress"
+        android:layout_width="120dp"
+        android:layout_height="150dp"/>
+
+</LinearLayout>
+```
+It's important that the `SpeechProgressView` is always inside a LinearLayout to function properly. You can adjust width and height accordingly to the bar height settings (see below).
+
+then, when you start speech recognition, pass also the `SpeechProgressView`:
+
+```java
+Speech.getInstance().startListening(speechProgressView, speechDelegate);
+```
+
+#### Set custom bar colors
+You can set all the 5 bar colors as you wish. This is just an example:
+```java
+int[] colors = {
+        ContextCompat.getColor(this, android.R.color.black),
+        ContextCompat.getColor(this, android.R.color.darker_gray),
+        ContextCompat.getColor(this, android.R.color.black),
+        ContextCompat.getColor(this, android.R.color.holo_orange_dark),
+        ContextCompat.getColor(this, android.R.color.holo_red_dark)
+};
+speechProgressView.setColors(colors);
+```
+
+#### Set custom maximum bar height
+```java
+int[] heights = {60, 76, 58, 80, 55};
+speechProgressView.setBarMaxHeightsInDp(heights);
+```
+
 ### Text to speech
 Inside an activity:
 ```java

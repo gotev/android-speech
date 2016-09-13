@@ -2,7 +2,13 @@
     <string name="app_name">Speech Demo</string>
     <string name="start_listening">Start listening</string>
     <string name="stop_listening">Stop listening</string>
-    <string name="say_something">Say something</string>
+    <string name="say_something">Say</string>
     <string name="introduction">Tap on one of the buttons to try an action</string>
-    <string name="demo_tts">Ciao, sono la tua assistente</string>
+    <string name="tts_hint">Write something to speech</string>
+    <string name="repeat">Repeat please</string>
+    <string name="input_something">Please input something to speak!</string>
+    <string name="speech_not_available">Speech recognition is not available on this device. Do you want to install Google app to have speech recognition?</string>
+    <string name="permission_required">You need to grant the permission to use the microphone</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

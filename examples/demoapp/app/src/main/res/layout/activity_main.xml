@@ -17,21 +17,30 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
-    <net.gotev.speech.ui.SpeechProgressView
-        android:id="@+id/progress"
-        android:background="@android:color/holo_blue_light"
-        android:layout_width="200dp"
-        android:layout_height="150dp"
-        android:layout_above="@+id/button"
-        android:layout_centerHorizontal="true" />
-
-    <Button
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/start_listening"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:id="@+id/linearLayout">
+
+        <net.gotev.speech.ui.SpeechProgressView
+            android:id="@+id/progress"
+            android:layout_width="120dp"
+            android:layout_height="150dp"/>
+
+    </LinearLayout>
+
+    <ImageButton
+        android:background="@android:color/transparent"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
         android:id="@+id/button"
-        android:layout_above="@+id/speak"
-        android:layout_centerHorizontal="true" />
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_mic" />
 
     <Button
         android:layout_width="wrap_content"
@@ -39,5 +48,18 @@
         android:text="@string/say_something"
         android:id="@+id/speak"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true" />
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/textToSpeech"
+        android:hint="@string/tts_hint"
+        android:layout_alignTop="@+id/speak"
+        android:layout_toLeftOf="@+id/speak"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true" />
+
 </RelativeLayout>

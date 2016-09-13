@@ -10,6 +10,7 @@ import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.widget.LinearLayout;
 
 import net.gotev.speech.ui.SpeechProgressView;
 
@@ -364,6 +365,9 @@ public class Speech {
             Logger.debug(getClass().getSimpleName(), "Hey man calm down! Throttling start to prevent disaster!");
             return;
         }
+
+        if (progressView != null && !(progressView.getParent() instanceof LinearLayout))
+            throw new IllegalArgumentException("progressView must be put inside a LinearLayout!");
 
         mProgressView = progressView;
         mDelegate = delegate;

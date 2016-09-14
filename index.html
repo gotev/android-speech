@@ -1,37 +1,34 @@
 <!DOCTYPE html>
 <html>
-
   <head>
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <meta name="description" content="Android Speech : Android speech recognition and text to speech made easy">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link href='https://fonts.googleapis.com/css?family=Architects+Daughter' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/github-light.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print">
 
-    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
 
-    <title>Android Speech</title>
+    <title>Android Speech by gotev</title>
   </head>
 
   <body>
+    <header>
+      <div class="inner">
+        <h1>Android Speech</h1>
+        <h2>Android speech recognition and text to speech made easy</h2>
+        <a href="https://github.com/gotev/android-speech" class="button"><small>View project on</small> GitHub</a>
+      </div>
+    </header>
 
-    <!-- HEADER -->
-    <div id="header_wrap" class="outer">
-        <header class="inner">
-          <a id="forkme_banner" href="https://github.com/gotev/android-speech">View on GitHub</a>
-
-          <h1 id="project_title">Android Speech</h1>
-          <h2 id="project_tagline">Android speech recognition and text to speech made easy</h2>
-
-            <section id="downloads">
-              <a class="zip_download_link" href="https://github.com/gotev/android-speech/zipball/master">Download this project as a .zip file</a>
-              <a class="tar_download_link" href="https://github.com/gotev/android-speech/tarball/master">Download this project as a tar.gz file</a>
-            </section>
-        </header>
-    </div>
-
-    <!-- MAIN CONTENT -->
-    <div id="main_content_wrap" class="outer">
-      <section id="main_content" class="inner">
-        <p><a href="https://travis-ci.org/gotev/android-speech"><img src="https://travis-ci.org/gotev/android-speech.svg?branch=master" alt="Build Status"></a> <a href="https://bintray.com/gotev/maven/android-speech/_latestVersion"> <img src="https://api.bintray.com/packages/gotev/maven/android-speech/images/download.svg" alt="Download"> </a></p>
+    <div id="content-wrapper">
+      <div class="inner clearfix">
+        <section id="main-content">
+          <p><a href="https://travis-ci.org/gotev/android-speech"><img src="https://travis-ci.org/gotev/android-speech.svg?branch=master" alt="Build Status"></a> <a href="https://bintray.com/gotev/maven/android-speech/_latestVersion"> <img src="https://api.bintray.com/packages/gotev/maven/android-speech/images/download.svg" alt="Download"> </a></p>
 
 <h2>
 <a id="setup" class="anchor" href="#setup" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Setup</h2>
@@ -40,7 +37,7 @@
 <a id="gradle" class="anchor" href="#gradle" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Gradle</h3>
 
 <pre><code>dependencies {
-    compile 'net.gotev:speech:1.0'
+    compile 'net.gotev:speech:1.1.1'
 }
 </code></pre>
 
@@ -50,7 +47,7 @@
 <pre><code>&lt;dependency&gt;
   &lt;groupId&gt;net.gotev&lt;/groupId&gt;
   &lt;artifactId&gt;speech&lt;/artifactId&gt;
-  &lt;version&gt;1.0&lt;/version&gt;
+  &lt;version&gt;1.1.1&lt;/version&gt;
   &lt;type&gt;aar&lt;/type&gt;
 &lt;/dependency&gt;
 </code></pre>
@@ -155,6 +152,50 @@
 }</pre></div>
 
 <h3>
+<a id="display-progress-animation" class="anchor" href="#display-progress-animation" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Display progress animation</h3>
+
+<p>Add this to your layout:</p>
+
+<div class="highlight highlight-text-xml"><pre>&lt;<span class="pl-ent">LinearLayout</span>
+    <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">orientation</span>=<span class="pl-s"><span class="pl-pds">"</span>vertical<span class="pl-pds">"</span></span>
+    <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">layout_width</span>=<span class="pl-s"><span class="pl-pds">"</span>wrap_content<span class="pl-pds">"</span></span>
+    <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">layout_height</span>=<span class="pl-s"><span class="pl-pds">"</span>wrap_content<span class="pl-pds">"</span></span>
+    <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>@+id/linearLayout<span class="pl-pds">"</span></span>&gt;
+
+    &lt;<span class="pl-ent">net</span>.gotev.speech.ui.SpeechProgressView
+        <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">id</span>=<span class="pl-s"><span class="pl-pds">"</span>@+id/progress<span class="pl-pds">"</span></span>
+        <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">layout_width</span>=<span class="pl-s"><span class="pl-pds">"</span>120dp<span class="pl-pds">"</span></span>
+        <span class="pl-e">android</span><span class="pl-e">:</span><span class="pl-e">layout_height</span>=<span class="pl-s"><span class="pl-pds">"</span>150dp<span class="pl-pds">"</span></span>/&gt;
+
+&lt;/<span class="pl-ent">LinearLayout</span>&gt;</pre></div>
+
+<p>It's important that the <code>SpeechProgressView</code> is always inside a LinearLayout to function properly. You can adjust width and height accordingly to the bar height settings (see below).</p>
+
+<p>then, when you start speech recognition, pass also the <code>SpeechProgressView</code>:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-smi">Speech</span><span class="pl-k">.</span>getInstance()<span class="pl-k">.</span>startListening(speechProgressView, speechDelegate);</pre></div>
+
+<h4>
+<a id="set-custom-bar-colors" class="anchor" href="#set-custom-bar-colors" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Set custom bar colors</h4>
+
+<p>You can set all the 5 bar colors as you wish. This is just an example:</p>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-k">int</span>[] colors <span class="pl-k">=</span> {
+        <span class="pl-smi">ContextCompat</span><span class="pl-k">.</span>getColor(<span class="pl-v">this</span>, <span class="pl-smi">android<span class="pl-k">.</span>R</span><span class="pl-k">.</span>color<span class="pl-k">.</span>black),
+        <span class="pl-smi">ContextCompat</span><span class="pl-k">.</span>getColor(<span class="pl-v">this</span>, <span class="pl-smi">android<span class="pl-k">.</span>R</span><span class="pl-k">.</span>color<span class="pl-k">.</span>darker_gray),
+        <span class="pl-smi">ContextCompat</span><span class="pl-k">.</span>getColor(<span class="pl-v">this</span>, <span class="pl-smi">android<span class="pl-k">.</span>R</span><span class="pl-k">.</span>color<span class="pl-k">.</span>black),
+        <span class="pl-smi">ContextCompat</span><span class="pl-k">.</span>getColor(<span class="pl-v">this</span>, <span class="pl-smi">android<span class="pl-k">.</span>R</span><span class="pl-k">.</span>color<span class="pl-k">.</span>holo_orange_dark),
+        <span class="pl-smi">ContextCompat</span><span class="pl-k">.</span>getColor(<span class="pl-v">this</span>, <span class="pl-smi">android<span class="pl-k">.</span>R</span><span class="pl-k">.</span>color<span class="pl-k">.</span>holo_red_dark)
+};
+speechProgressView<span class="pl-k">.</span>setColors(colors);</pre></div>
+
+<h4>
+<a id="set-custom-maximum-bar-height" class="anchor" href="#set-custom-maximum-bar-height" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Set custom maximum bar height</h4>
+
+<div class="highlight highlight-source-java"><pre><span class="pl-k">int</span>[] heights <span class="pl-k">=</span> {<span class="pl-c1">60</span>, <span class="pl-c1">76</span>, <span class="pl-c1">58</span>, <span class="pl-c1">80</span>, <span class="pl-c1">55</span>};
+speechProgressView<span class="pl-k">.</span>setBarMaxHeightsInDp(heights);</pre></div>
+
+<h3>
 <a id="text-to-speech" class="anchor" href="#text-to-speech" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Text to speech</h3>
 
 <p>Inside an activity:</p>
@@ -190,6 +231,11 @@
 <p>Refer to JavaDocs for a complete reference.</p>
 
 <h2>
+<a id="credits" class="anchor" href="#credits" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Credits</h2>
+
+<p>Thanks to <a href="https://github.com/zagum" class="user-mention">@zagum</a> for the original implementation of the <a href="https://github.com/zagum/SpeechRecognitionView">speech recognition view</a>.</p>
+
+<h2>
 <a id="license" class="anchor" href="#license" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>License</h2>
 
 <pre><code>Copyright (C) 2016 Aleksandar Gotev
@@ -206,18 +252,25 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 </code></pre>
-      </section>
+        </section>
+
+        <aside id="sidebar">
+          <a href="https://github.com/gotev/android-speech/zipball/master" class="button">
+            <small>Download</small>
+            .zip file
+          </a>
+          <a href="https://github.com/gotev/android-speech/tarball/master" class="button">
+            <small>Download</small>
+            .tar.gz file
+          </a>
+
+          <p class="repo-owner"><a href="https://github.com/gotev/android-speech"></a> is maintained by <a href="https://github.com/gotev">gotev</a>.</p>
+
+          <p>This page was generated by <a href="https://pages.github.com">GitHub Pages</a> using the Architect theme by <a href="https://twitter.com/jasonlong">Jason Long</a>.</p>
+        </aside>
+      </div>
     </div>
 
-    <!-- FOOTER  -->
-    <div id="footer_wrap" class="outer">
-      <footer class="inner">
-        <p class="copyright">Android Speech maintained by <a href="https://github.com/gotev">gotev</a></p>
-        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
-      </footer>
-    </div>
-
-    
-
+  
   </body>
 </html>

@@ -476,9 +476,6 @@ public class Speech {
      * @param callback callback which will receive progress status of the operation
      */
     public void say(String message, TextToSpeechCallback callback) {
-        mTextToSpeech.setLanguage(mLocale);
-        mTextToSpeech.setSpeechRate(mTtsRate);
-        mTextToSpeech.setPitch(mTtsPitch);
 
         String utteranceId = UUID.randomUUID().toString();
 
@@ -534,6 +531,7 @@ public class Speech {
      */
     public Speech setLocale(Locale locale) {
         mLocale = locale;
+        mTextToSpeech.setLanguage(locale);
         return this;
     }
 
@@ -546,6 +544,7 @@ public class Speech {
      */
     public Speech setTextToSpeechRate(float rate) {
         mTtsRate = rate;
+        mTextToSpeech.setSpeechRate(rate);
         return this;
     }
 
@@ -558,6 +557,7 @@ public class Speech {
      */
     public Speech setTextToSpeechPitch(float pitch) {
         mTtsPitch = pitch;
+        mTextToSpeech.setPitch(pitch);
         return this;
     }
 

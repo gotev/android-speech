@@ -52,6 +52,7 @@ public class Speech {
     private Locale mLocale = Locale.getDefault();
     private float mTtsRate = 1.0f;
     private float mTtsPitch = 1.0f;
+    private int mTtsQueueMode = TextToSpeech.QUEUE_FLUSH;
     private long mStopListeningDelayInMs = 4000;
     private long mTransitionMinimumDelay = 1200;
     private long mLastActionTimestamp;
@@ -486,11 +487,11 @@ public class Speech {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mTextToSpeech.speak(message, TextToSpeech.QUEUE_ADD, null, utteranceId);
+            mTextToSpeech.speak(message, mTtsQueueMode, null, utteranceId);
         } else {
             HashMap<String, String> params = new HashMap<>();
             params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId);
-            mTextToSpeech.speak(message, TextToSpeech.QUEUE_ADD, params);
+            mTextToSpeech.speak(message, mTtsQueueMode, params);
         }
     }
 
@@ -579,6 +580,19 @@ public class Speech {
      */
     public Speech setTransitionMinimumDelay(long milliseconds) {
         mTransitionMinimumDelay = milliseconds;
+        return this;
+    }
+
+    /**
+     * Sets the text to speech queue mode.
+     * By default is TextToSpeech.QUEUE_FLUSH, which is faster, because it clears all the
+     * messages before speaking the new one. TextToSpeech.QUEUE_ADD adds the last message
+     * to speak in the queue, without clearing the messages that have been added.
+     * @param mode It can be either TextToSpeech.QUEUE_ADD or TextToSpeech.QUEUE_FLUSH.
+     * @return speech instance
+     */
+    public Speech setTextToSpeechQueueMode(int mode) {
+        mTtsQueueMode = mode;
         return this;
     }
 

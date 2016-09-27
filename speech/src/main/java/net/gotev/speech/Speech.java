@@ -400,6 +400,11 @@ public class Speech {
 
     }
 
+    public void unregisterDelegate() {
+        mDelegate = null;
+        mProgressView = null;
+    }
+
     private void updateLastActionTimestamp() {
         mLastActionTimestamp = new Date().getTime();
     }

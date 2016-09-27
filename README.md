@@ -7,7 +7,7 @@ Android speech recognition and text to speech made easy
 ### Gradle
 ```
 dependencies {
-    compile 'net.gotev:speech:1.1.2'
+    compile 'net.gotev:speech:1.1.3'
 }
 ```
 ### Maven
@@ -15,7 +15,7 @@ dependencies {
 <dependency>
   <groupId>net.gotev</groupId>
   <artifactId>speech</artifactId>
-  <version>1.1.2</version>
+  <version>1.1.3</version>
   <type>aar</type>
 </dependency>
 ```
@@ -111,6 +111,16 @@ try {
     // to redirect the user to the Google App page on Play Store
 }
 ```
+
+### Unregister delegate
+In you Activity's `OnDestroy`, add:
+```java
+@Override
+protected void onDestroy() {
+    Speech.getInstance().unregisterDelegate();
+}
+```
+To prevent memory leaks.
 
 ### Display progress animation
 Add this to your layout:

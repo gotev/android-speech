@@ -62,6 +62,11 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         progress.setColors(colors);
     }
 
+    @Override
+    protected void onDestroy() {
+        Speech.getInstance().unregisterDelegate();
+    }
+
     private void onButtonClick() {
         if (Speech.getInstance().isListening()) {
             Speech.getInstance().stopListening();

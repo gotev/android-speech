@@ -56,6 +56,7 @@ public class Speech {
     private long mStopListeningDelayInMs = 4000;
     private long mTransitionMinimumDelay = 1200;
     private long mLastActionTimestamp;
+    private List<String> mLastPartialResults = null;
 
     private TextToSpeech.OnInitListener mTttsInitListener = new TextToSpeech.OnInitListener() {
         @Override
@@ -174,7 +175,10 @@ public class Speech {
                 mUnstableData = unstableData != null && !unstableData.isEmpty()
                         ? unstableData.get(0) : null;
                 try {
-                    mDelegate.onSpeechPartialResults(partialResults);
+                    if (mLastPartialResults == null || !mLastPartialResults.equals(partialResults)) {
+                        mDelegate.onSpeechPartialResults(partialResults);
+                        mLastPartialResults = partialResults;
+                    }
                 } catch (Throwable exc) {
                     Logger.error(Speech.class.getSimpleName(),
                             "Unhandled exception in delegate onSpeechPartialResults", exc);

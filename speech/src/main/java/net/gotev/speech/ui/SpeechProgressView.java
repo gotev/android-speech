@@ -93,6 +93,7 @@ public class SpeechProgressView extends View {
 
     /**
      * Set one color to all bars in view
+     * @param color bar color
      */
     public void setSingleColor(int color) {
         barColor = color;

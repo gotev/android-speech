@@ -7,7 +7,7 @@ Android speech recognition and text to speech made easy
 ### Gradle
 ```
 dependencies {
-    compile 'net.gotev:speech:1.1.4'
+    compile 'net.gotev:speech:1.1.5'
 }
 ```
 ### Maven
@@ -15,7 +15,7 @@ dependencies {
 <dependency>
   <groupId>net.gotev</groupId>
   <artifactId>speech</artifactId>
-  <version>1.1.4</version>
+  <version>1.1.5</version>
   <type>aar</type>
 </dependency>
 ```
@@ -109,6 +109,8 @@ try {
     // SpeechUtil.redirectUserToGoogleAppOnPlayStore(this);
     //
     // to redirect the user to the Google App page on Play Store
+} catch (GoogleVoiceTypingDisabledException exc) {
+    Log.e("speech", "Google voice typing must be enabled!");
 }
 ```
 

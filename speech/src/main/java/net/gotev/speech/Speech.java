@@ -345,8 +345,10 @@ public class Speech {
      * Starts voice recognition.
      * @param delegate delegate which will receive speech recognition events and status
      * @throws SpeechRecognitionNotAvailable when speech recognition is not available on the device
+     * @throws GoogleVoiceTypingDisabledException when google voice typing is disabled on the device
      */
-    public void startListening(SpeechDelegate delegate) throws SpeechRecognitionNotAvailable {
+    public void startListening(SpeechDelegate delegate)
+            throws SpeechRecognitionNotAvailable, GoogleVoiceTypingDisabledException {
         startListening(null, delegate);
     }
 
@@ -355,9 +357,10 @@ public class Speech {
      * @param progressView view in which to draw speech animation
      * @param delegate delegate which will receive speech recognition events and status
      * @throws SpeechRecognitionNotAvailable when speech recognition is not available on the device
+     * @throws GoogleVoiceTypingDisabledException when google voice typing is disabled on the device
      */
     public void startListening(SpeechProgressView progressView, SpeechDelegate delegate)
-            throws SpeechRecognitionNotAvailable{
+            throws SpeechRecognitionNotAvailable, GoogleVoiceTypingDisabledException {
         if (mIsListening) return;
 
         if (mSpeechRecognizer == null)
@@ -391,7 +394,12 @@ public class Speech {
             intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, mPreferOffline);
         }
 
-        mSpeechRecognizer.startListening(intent);
+        try {
+            mSpeechRecognizer.startListening(intent);
+        } catch (SecurityException exc) {
+            throw new GoogleVoiceTypingDisabledException();
+        }
+
         mIsListening = true;
         updateLastActionTimestamp();
 

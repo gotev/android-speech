@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import com.tbruyelle.rxpermissions.RxPermissions;
 
+import net.gotev.speech.GoogleVoiceTypingDisabledException;
 import net.gotev.speech.Speech;
 import net.gotev.speech.SpeechDelegate;
 import net.gotev.speech.SpeechRecognitionNotAvailable;
@@ -90,8 +91,12 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         try {
             Speech.getInstance().stopTextToSpeech();
             Speech.getInstance().startListening(progress, MainActivity.this);
+
         } catch (SpeechRecognitionNotAvailable exc) {
             showSpeechNotSupportedDialog();
+
+        } catch (GoogleVoiceTypingDisabledException exc) {
+            showEnableGoogleVoiceTyping();
         }
     }
 
@@ -172,6 +177,19 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
                 .setCancelable(false)
                 .setPositiveButton(R.string.yes, dialogClickListener)
                 .setNegativeButton(R.string.no, dialogClickListener)
+                .show();
+    }
+
+    private void showEnableGoogleVoiceTyping() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(R.string.enable_google_voice_typing)
+                .setCancelable(false)
+                .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        // do nothing
+                    }
+                })
                 .show();
     }
 

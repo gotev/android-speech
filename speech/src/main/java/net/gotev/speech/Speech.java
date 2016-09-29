@@ -259,7 +259,14 @@ public class Speech {
 
         if (SpeechRecognizer.isRecognitionAvailable(context)) {
             if (mSpeechRecognizer != null) {
-                mSpeechRecognizer.destroy();
+                try {
+                    mSpeechRecognizer.destroy();
+                } catch (Throwable exc) {
+                    Logger.debug(Speech.class.getSimpleName(),
+                            "Non-Fatal error while destroying speech. " + exc.getMessage());
+                } finally {
+                    mSpeechRecognizer = null;
+                }
             }
 
             mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(context);

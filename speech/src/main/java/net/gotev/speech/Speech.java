@@ -152,7 +152,8 @@ public class Speech {
         @Override
         public void onRmsChanged(float v) {
             try {
-                mDelegate.onSpeechRmsChanged(v);
+                if (mDelegate != null)
+                    mDelegate.onSpeechRmsChanged(v);
             } catch (Throwable exc) {
                 Logger.error(Speech.class.getSimpleName(),
                         "Unhandled exception in delegate onSpeechRmsChanged", exc);
@@ -176,7 +177,8 @@ public class Speech {
                         ? unstableData.get(0) : null;
                 try {
                     if (mLastPartialResults == null || !mLastPartialResults.equals(partialResults)) {
-                        mDelegate.onSpeechPartialResults(partialResults);
+                        if (mDelegate != null)
+                            mDelegate.onSpeechPartialResults(partialResults);
                         mLastPartialResults = partialResults;
                     }
                 } catch (Throwable exc) {
@@ -205,7 +207,8 @@ public class Speech {
             mIsListening = false;
 
             try {
-                mDelegate.onSpeechResult(result.trim());
+                if (mDelegate != null)
+                    mDelegate.onSpeechResult(result.trim());
             } catch (Throwable exc) {
                 Logger.error(Speech.class.getSimpleName(),
                         "Unhandled exception in delegate onSpeechResult", exc);
@@ -411,7 +414,8 @@ public class Speech {
         updateLastActionTimestamp();
 
         try {
-            mDelegate.onStartOfSpeech();
+            if (mDelegate != null)
+                mDelegate.onStartOfSpeech();
         } catch (Throwable exc) {
             Logger.error(Speech.class.getSimpleName(),
                     "Unhandled exception in delegate onStartOfSpeech", exc);
@@ -465,7 +469,8 @@ public class Speech {
     private void returnPartialResultsAndRecreateSpeechRecognizer() {
         mIsListening = false;
         try {
-            mDelegate.onSpeechResult(getPartialResultsAsString());
+            if (mDelegate != null)
+                mDelegate.onSpeechResult(getPartialResultsAsString());
         } catch (Throwable exc) {
             Logger.error(Speech.class.getSimpleName(),
                     "Unhandled exception in delegate onSpeechResult", exc);

@@ -1,16 +1,18 @@
 apply plugin: 'com.android.application'
 apply plugin: 'me.tatarka.retrolambda'
 
+def targetSdk = 25
+
 android {
-    compileSdkVersion 24
-    buildToolsVersion "23.0.3"
+    compileSdkVersion targetSdk
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         applicationId "net.gotev.speechdemo"
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion targetSdk
         versionCode 5
-        versionName "1.1.7"
+        versionName "1.1.8"
     }
     buildTypes {
         release {
@@ -28,7 +30,7 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile project(':speech')
-    compile 'com.android.support:appcompat-v7:24.2.1'
+    compile 'com.android.support:appcompat-v7:25.+'
     compile 'com.tbruyelle.rxpermissions:rxpermissions:0.7.0@aar'
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.6'

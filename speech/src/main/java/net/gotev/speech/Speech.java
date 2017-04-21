@@ -339,6 +339,27 @@ public class Speech {
         return instance;
     }
 
+    public synchronized void deinit() {
+        if (mSpeechRecognizer != null) {
+            try {
+                mSpeechRecognizer.stopListening();
+            } catch (Exception exc) {
+                Logger.error(getClass().getSimpleName(), "Warning while de-initing speech recognizer", exc);
+            }
+        }
+
+        if (mTextToSpeech != null) {
+            try {
+                mTextToSpeech.stop();
+            } catch (Exception exc) {
+                Logger.error(getClass().getSimpleName(), "Warning while de-initing text to speech", exc);
+            }
+        }
+
+        unregisterDelegate();
+        instance = null;
+    }
+
     /**
      * Gets speech recognition instance.
      * @return SpeechRecognition instance

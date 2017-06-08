@@ -65,7 +65,8 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
 
     @Override
     protected void onDestroy() {
-        Speech.getInstance().unregisterDelegate();
+        super.onDestroy();
+        Speech.getInstance().shutdown();
     }
 
     private void onButtonClick() {

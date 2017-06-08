@@ -339,7 +339,10 @@ public class Speech {
         return instance;
     }
 
-    public synchronized void deinit() {
+    /**
+     * Must be called inside Activity's onDestroy.
+     */
+    public synchronized void shutdown() {
         if (mSpeechRecognizer != null) {
             try {
                 mSpeechRecognizer.stopListening();
@@ -351,6 +354,7 @@ public class Speech {
         if (mTextToSpeech != null) {
             try {
                 mTextToSpeech.stop();
+                mTextToSpeech.shutdown();
             } catch (Exception exc) {
                 Logger.error(getClass().getSimpleName(), "Warning while de-initing text to speech", exc);
             }
@@ -444,7 +448,7 @@ public class Speech {
 
     }
 
-    public void unregisterDelegate() {
+    private void unregisterDelegate() {
         mDelegate = null;
         mProgressView = null;
     }

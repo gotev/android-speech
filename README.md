@@ -7,7 +7,7 @@ Android speech recognition and text to speech made easy
 ### Gradle
 ```
 dependencies {
-    compile 'net.gotev:speech:1.1.9'
+    compile 'net.gotev:speech:1.2'
 }
 ```
 
@@ -105,12 +105,12 @@ try {
 }
 ```
 
-### Unregister delegate
-In you Activity's `OnDestroy`, add:
+### Release resources
+In your Activity's `onDestroy`, add:
 ```java
 @Override
 protected void onDestroy() {
-    Speech.getInstance().unregisterDelegate();
+    Speech.getInstance().shutdown();
 }
 ```
 To prevent memory leaks.
@@ -196,7 +196,7 @@ Thanks to @zagum for the original implementation of the [speech recognition view
 
 ## License
 
-    Copyright (C) 2016 Aleksandar Gotev
+    Copyright (C) 2017 Aleksandar Gotev
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

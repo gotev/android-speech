@@ -7,7 +7,7 @@ Android speech recognition and text to speech made easy
 ### Gradle
 ```
 dependencies {
-    compile 'net.gotev:speech:1.2'
+    compile 'net.gotev:speech:1.2.1'
 }
 ```
 

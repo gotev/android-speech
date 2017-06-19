@@ -286,7 +286,7 @@ public class Speech {
 
     private void initTts(Context context) {
         if (mTextToSpeech == null) {
-            mTextToSpeech = new TextToSpeech(context, mTttsInitListener);
+            mTextToSpeech = new TextToSpeech(context.getApplicationContext(), mTttsInitListener);
             mTextToSpeech.setOnUtteranceProgressListener(mTtsProgressListener);
             mTextToSpeech.setLanguage(mLocale);
             mTextToSpeech.setPitch(mTtsPitch);

@@ -308,6 +308,7 @@ public class Speech {
 
         if (mTextToSpeech != null) {
             try {
+                mTtsCallbacks.clear();
                 mTextToSpeech.stop();
                 mTextToSpeech.shutdown();
             } catch (final Exception exc) {
@@ -619,5 +620,5 @@ public class Speech {
         mTtsQueueMode = mode;
         return this;
     }
-    
+
 }

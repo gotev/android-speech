@@ -619,5 +619,5 @@ public class Speech {
         mTtsQueueMode = mode;
         return this;
     }
-
+    
 }

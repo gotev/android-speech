@@ -8,7 +8,7 @@ def projectName = "android-speech"
 def projectDesc = "Android speech recognition and text to speech made easy"
 def projectGroup = "net.gotev"
 group = projectGroup
-version = "1.2.1"
+version = "1.2.2"
 
 def targetSdk = 25
 
@@ -19,7 +19,7 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion targetSdk
-        versionCode 15
+        versionCode 16
         versionName version
     }
     buildTypes {

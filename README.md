@@ -6,21 +6,26 @@ Android speech recognition and text to speech made easy
 ## Setup
 ### Gradle
 ```
-dependencies {
-    compile 'net.gotev:speech:1.2.2'
-}
+compile 'net.gotev:speech:1.3'
 ```
 
 ## Initialization
-To start using the library, you have to initialize it in your [Application subclass](http://developer.android.com/reference/android/app/Application.html):
+To start using the library, you have to initialize it in your Activity
 ```java
-public class Initializer extends Application {
+public class YourActivity extends Activity {
+
+    Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.your_layout);
+
+        Speech.init(this, getPackageName());
+    }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-
-        Speech.init(this);
+    protected void onDestroy() {
+        // prevent memory leaks when activity is destroyed
+        Speech.getInstance().shutdown();
     }
 }
 ```

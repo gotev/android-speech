@@ -6,7 +6,7 @@ Android speech recognition and text to speech made easy
 ## Setup
 ### Gradle
 ```
-compile 'net.gotev:speech:1.3'
+compile 'net.gotev:speech:1.3.1'
 ```
 
 ## Initialization

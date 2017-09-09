@@ -76,7 +76,7 @@ public class Speech {
         }
     };
 
-    private final UtteranceProgressListener mTtsProgressListener = new TtsProgressListener(mContext, mTtsCallbacks);
+    private UtteranceProgressListener mTtsProgressListener;
 
     private final RecognitionListener mListener = new RecognitionListener() {
 
@@ -241,6 +241,7 @@ public class Speech {
 
     private void initTts(final Context context) {
         if (mTextToSpeech == null) {
+            mTtsProgressListener = new TtsProgressListener(mContext, mTtsCallbacks);
             mTextToSpeech = new TextToSpeech(context.getApplicationContext(), mTttsInitListener);
             mTextToSpeech.setOnUtteranceProgressListener(mTtsProgressListener);
             mTextToSpeech.setLanguage(mLocale);

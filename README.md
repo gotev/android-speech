@@ -215,3 +215,5 @@ Thanks to @zagum for the original implementation of the [speech recognition view
     See the License for the specific language governing permissions and
     limitations under the License.
 
+## Contributors
+Thanks to [Kristiyan Petrov](https://github.com/kristiyanP) for code review, bug fixes and library improvement ideas.

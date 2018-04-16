@@ -15,7 +15,7 @@ To start using the library, you have to initialize it in your Activity
 ```java
 public class YourActivity extends Activity {
 
-    Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.your_layout);

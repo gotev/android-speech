@@ -1,12 +1,13 @@
 # Android Speech
-[![Build Status](https://travis-ci.org/gotev/android-speech.svg?branch=master)](https://travis-ci.org/gotev/android-speech) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-speech/images/download.svg) ](https://bintray.com/gotev/maven/android-speech/_latestVersion) <a href="http://www.methodscount.com/?lib=net.gotev%3Aspeech%3A1.1.9"><img src="https://img.shields.io/badge/Methods and size-316 | 37 KB-e91e63.svg"/></a>
+<!-- [![Build Status](https://travis-ci.org/gotev/android-speech.svg?branch=master)](https://travis-ci.org/gotev/android-speech) [ ![Download](https://api.bintray.com/packages/gotev/maven/android-speech/images/download.svg) ](https://bintray.com/gotev/maven/android-speech/_latestVersion) <a href="http://www.methodscount.com/?lib=net.gotev%3Aspeech%3A1.1.9"><img src="https://img.shields.io/badge/Methods and size-316 | 37 KB-e91e63.svg"/></a>  -->
 
 Android speech recognition and text to speech made easy
 
 ## Setup
 ### Gradle
+Repo in progress...
 ```
-compile 'net.gotev:speech:1.3.1'
+compile 'io.aira:speech:1.3.2'
 ```
 
 ## Initialization
@@ -14,7 +15,7 @@ To start using the library, you have to initialize it in your Activity
 ```java
 public class YourActivity extends Activity {
 
-    Override
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.your_layout);

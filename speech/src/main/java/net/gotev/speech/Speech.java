@@ -54,6 +54,7 @@ public class Speech {
     private int mTtsQueueMode = TextToSpeech.QUEUE_FLUSH;
     private long mStopListeningDelayInMs = 4000;
     private long mTransitionMinimumDelay = 1200;
+    private int mAudioStream = TextToSpeech.Engine.DEFAULT_STREAM;
     private long mLastActionTimestamp;
     private List<String> mLastPartialResults = null;
 
@@ -378,7 +379,7 @@ public class Speech {
         final Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
                 .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
                 .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, mGetPartialResults)
-                .putExtra(RecognizerIntent.EXTRA_LANGUAGE, mLocale.getLanguage())
+                .putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, mLocale.getLanguage())
                 .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
 
         if (mCallingPackage != null && !mCallingPackage.isEmpty()) {
@@ -501,9 +502,12 @@ public class Speech {
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            mTextToSpeech.speak(message, mTtsQueueMode, null, utteranceId);
+            final Bundle params = new Bundle();
+            params.putString(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(mAudioStream));
+            mTextToSpeech.speak(message, mTtsQueueMode, params, utteranceId);
         } else {
             final HashMap<String, String> params = new HashMap<>();
+            params.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(mAudioStream));
             params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId);
             mTextToSpeech.speak(message, mTtsQueueMode, params);
         }
@@ -619,6 +623,21 @@ public class Speech {
      */
     public Speech setTextToSpeechQueueMode(final int mode) {
         mTtsQueueMode = mode;
+        return this;
+    }
+
+
+    /**
+     * Sets the audio stream type.
+     * By default is TextToSpeech.Engine.DEFAULT_STREAM, which is equivalent to
+     * AudioManager.STREAM_MUSIC.
+     *
+     * @param audioStream A constant from AudioManager.
+     *                    e.g. {@link android.media.AudioManager#STREAM_VOICE_CALL}
+     * @return speech instance
+     */
+    public Speech setAudioStream(final int audioStream){
+        mAudioStream = audioStream;
         return this;
     }
 

@@ -379,7 +379,7 @@ public class Speech {
         final Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
                 .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
                 .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, mGetPartialResults)
-                .putExtra(RecognizerIntent.EXTRA_LANGUAGE, mLocale.getLanguage())
+                .putExtra(RecognizerIntent.EXTRA_LANGUAGE_PREFERENCE, mLocale.getLanguage())
                 .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
 
         if (mCallingPackage != null && !mCallingPackage.isEmpty()) {

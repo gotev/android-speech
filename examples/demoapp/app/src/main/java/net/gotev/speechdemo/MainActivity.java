@@ -2,10 +2,8 @@ package net.gotev.speechdemo;
 
 import android.Manifest;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,8 +11,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.tbruyelle.rxpermissions.RxPermissions;
 
 import net.gotev.speech.GoogleVoiceTypingDisabledException;
 import net.gotev.speech.Speech;
@@ -27,7 +23,15 @@ import net.gotev.toyproject.R;
 
 import java.util.List;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+
 public class MainActivity extends AppCompatActivity implements SpeechDelegate {
+
+    private final int PERMISSIONS_REQUEST = 1;
 
     private ImageButton button;
     private Button speak;
@@ -41,17 +45,19 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        linearLayout = (LinearLayout) findViewById(R.id.linearLayout);
+        Speech.init(this, getPackageName());
 
-        button = (ImageButton) findViewById(R.id.button);
+        linearLayout = findViewById(R.id.linearLayout);
+
+        button = findViewById(R.id.button);
         button.setOnClickListener(view -> onButtonClick());
 
-        speak = (Button) findViewById(R.id.speak);
+        speak = findViewById(R.id.speak);
         speak.setOnClickListener(view -> onSpeakClick());
 
-        text = (TextView) findViewById(R.id.text);
-        textToSpeech = (EditText) findViewById(R.id.textToSpeech) ;
-        progress = (SpeechProgressView) findViewById(R.id.progress);
+        text = findViewById(R.id.text);
+        textToSpeech = findViewById(R.id.textToSpeech) ;
+        progress = findViewById(R.id.progress);
 
         int[] colors = {
                 ContextCompat.getColor(this, android.R.color.black),
@@ -73,15 +79,26 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         if (Speech.getInstance().isListening()) {
             Speech.getInstance().stopListening();
         } else {
-            RxPermissions.getInstance(this)
-                    .request(Manifest.permission.RECORD_AUDIO)
-                    .subscribe(granted -> {
-                        if (granted) { // Always true pre-M
-                            onRecordAudioPermissionGranted();
-                        } else {
-                            Toast.makeText(MainActivity.this, R.string.permission_required, Toast.LENGTH_LONG);
-                        }
-                    });
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                onRecordAudioPermissionGranted();
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST);
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode != PERMISSIONS_REQUEST) {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        } else {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // permission was granted, yay!
+                onRecordAudioPermissionGranted();
+            } else {
+                // permission denied, boo!
+                Toast.makeText(MainActivity.this, R.string.permission_required, Toast.LENGTH_LONG).show();
+            }
         }
     }
 

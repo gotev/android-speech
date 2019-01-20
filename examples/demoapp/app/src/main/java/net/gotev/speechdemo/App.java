@@ -13,7 +13,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        Speech.init(this, getPackageName());
         Logger.setLogLevel(Logger.LogLevel.DEBUG);
     }
 }

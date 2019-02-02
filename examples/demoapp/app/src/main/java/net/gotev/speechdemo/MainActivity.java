@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         speak.setOnClickListener(view -> onSpeakClick());
 
         text = findViewById(R.id.text);
-        textToSpeech = findViewById(R.id.textToSpeech) ;
+        textToSpeech = findViewById(R.id.textToSpeech);
         progress = findViewById(R.id.progress);
 
         int[] colors = {
@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         SpeechUtil.redirectUserToGoogleAppOnPlayStore(MainActivity.this);
                         break;

@@ -2,6 +2,7 @@ package net.gotev.speech;
 
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.speech.RecognitionListener;
@@ -32,11 +33,13 @@ public class Speech {
 
     private static Speech instance = null;
 
+    private AudioManager mAudioManager = null;
     private SpeechRecognizer mSpeechRecognizer;
     private SpeechProgressView mProgressView;
     private String mCallingPackage;
     private boolean mPreferOffline = false;
     private boolean mGetPartialResults = true;
+    private boolean mMuteSpeechRecognizerSounds = false;
     private SpeechDelegate mDelegate;
     private boolean mIsListening = false;
 
@@ -163,8 +166,9 @@ public class Speech {
             mIsListening = false;
 
             try {
-                if (mDelegate != null)
+                if (mDelegate != null) {
                     mDelegate.onSpeechResult(result.trim());
+                }
             } catch (final Throwable exc) {
                 Logger.error(Speech.class.getSimpleName(),
                         "Unhandled exception in delegate onSpeechResult", exc);
@@ -180,6 +184,12 @@ public class Speech {
         public void onError(final int code) {
             Logger.error(LOG_TAG, "Speech recognition error", new SpeechRecognitionException(code));
             returnPartialResultsAndRecreateSpeechRecognizer();
+
+            // Turn the volume on again, if the volume was turned off to disable the 'beep'
+            // sounds performed by android speech recognizer.
+            if (mMuteSpeechRecognizerSounds) {
+                unmuteAudio();
+            }
         }
 
         @Override
@@ -191,6 +201,12 @@ public class Speech {
         public void onEndOfSpeech() {
             if (mProgressView != null)
                 mProgressView.onEndOfSpeech();
+
+            // Turn the volume on again, if the volume was turned off to disable the 'beep'
+            // sounds performed by android speech recognizer.
+            if (mMuteSpeechRecognizerSounds) {
+                unmuteAudio();
+            }
         }
 
         @Override
@@ -320,6 +336,12 @@ public class Speech {
 
         unregisterDelegate();
         instance = null;
+
+        // Turn the volume on again, if the volume was turned off to disable the 'beep'
+        // sounds performed by android speech recognizer.
+        if (mMuteSpeechRecognizerSounds) {
+            unmuteAudio();
+        }
     }
 
     /**
@@ -390,6 +412,12 @@ public class Speech {
             intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, mPreferOffline);
         }
 
+        // If the user wants to mute the starting and ending 'beep' sound,
+        // mute audio here, until the end of the speech input.
+        if (mMuteSpeechRecognizerSounds) {
+            muteAudio();
+        }
+
         try {
             mSpeechRecognizer.startListening(intent);
         } catch (final SecurityException exc) {
@@ -407,6 +435,29 @@ public class Speech {
                     "Unhandled exception in delegate onStartOfSpeech", exc);
         }
 
+    }
+
+    /**
+     * Mute audio in order to get rid of the android speech recognition 'beep' sound(s).
+     */
+    private void muteAudio() {
+        mAudioManager = (AudioManager) mContext.getSystemService(Context.AUDIO_SERVICE);
+        mAudioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, true);
+        mAudioManager.setStreamMute(AudioManager.STREAM_ALARM, true);
+        mAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
+        mAudioManager.setStreamMute(AudioManager.STREAM_RING, true);
+        mAudioManager.setStreamMute(AudioManager.STREAM_SYSTEM, true);
+    }
+
+    /**
+     * Enable audio again after the android speech recognition 'beep' sound(s) played.
+     */
+    private void unmuteAudio() {
+        mAudioManager.setStreamMute(AudioManager.STREAM_NOTIFICATION, false);
+        mAudioManager.setStreamMute(AudioManager.STREAM_ALARM, false);
+        mAudioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+        mAudioManager.setStreamMute(AudioManager.STREAM_RING, false);
+        mAudioManager.setStreamMute(AudioManager.STREAM_SYSTEM, false);
     }
 
     private void unregisterDelegate() {
@@ -437,6 +488,12 @@ public class Speech {
         mIsListening = false;
         updateLastActionTimestamp();
         returnPartialResultsAndRecreateSpeechRecognizer();
+
+        // Turn the volume on again, if the volume was turned off to disable the 'beep'
+        // sounds performed by android speech recognizer.
+        if (mMuteSpeechRecognizerSounds) {
+            unmuteAudio();
+        }
     }
 
     private String getPartialResultsAsString() {
@@ -455,8 +512,9 @@ public class Speech {
     private void returnPartialResultsAndRecreateSpeechRecognizer() {
         mIsListening = false;
         try {
-            if (mDelegate != null)
+            if (mDelegate != null) {
                 mDelegate.onSpeechResult(getPartialResultsAsString());
+            }
         } catch (final Throwable exc) {
             Logger.error(Speech.class.getSimpleName(),
                     "Unhandled exception in delegate onSpeechResult", exc);
@@ -543,6 +601,19 @@ public class Speech {
      */
     public Speech setGetPartialResults(final boolean getPartialResults) {
         mGetPartialResults = getPartialResults;
+        return this;
+    }
+
+    /**
+     * Set whether the start & end of the google voice assistant should be muted or not
+     * (default is false). The user may want to play their own start & end sounds, or nothing
+     * at all.
+     *
+     * @param muteSpeechRecognizerSounds true to mute the start & end sounds, false otherwise
+     * @return speech instance
+     */
+    public Speech setMuteSpeechRecognizerSounds(final boolean muteSpeechRecognizerSounds) {
+        mMuteSpeechRecognizerSounds = muteSpeechRecognizerSounds;
         return this;
     }
 
@@ -636,7 +707,7 @@ public class Speech {
      *                    e.g. {@link android.media.AudioManager#STREAM_VOICE_CALL}
      * @return speech instance
      */
-    public Speech setAudioStream(final int audioStream){
+    public Speech setAudioStream(final int audioStream) {
         mAudioStream = audioStream;
         return this;
     }

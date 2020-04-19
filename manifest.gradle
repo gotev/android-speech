@@ -12,7 +12,7 @@ ext {
     library_project_group = 'net.gotev'
     library_version = '2.0.0'
     version_code = 1
-    min_sdk = 18
+    min_sdk = 21
     target_sdk = 29
     demo_app_id = 'net.gotev.speechdemo'
 

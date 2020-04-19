@@ -54,4 +54,5 @@ dependencies {
     implementation 'com.google.android.material:material:1.0.0'
 
     implementation project(':speech')
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.2.0'
 }

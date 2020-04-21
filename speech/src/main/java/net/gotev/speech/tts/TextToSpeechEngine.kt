@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import net.gotev.speech.utils.selfReference
+import java.io.File
 import java.util.UUID
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -33,11 +34,7 @@ class TextToSpeechEngine(
                         self.setOnUtteranceProgressListener(progressListener)
                         continuation.resume(self)
                     } else {
-                        continuation.resumeWithException(
-                            TextToSpeechError(
-                                status
-                            )
-                        )
+                        continuation.resumeWithException(TextToSpeechError(status))
                     }
                 }
             }
@@ -63,7 +60,50 @@ class TextToSpeechEngine(
         if (!textToSpeech().speak(message, queueMode, params, utteranceID).isSuccessful)
             return false
 
-        return progressChannel.waitFor { it.utteranceID == utteranceID && it !is Status.Started }.isDone
+        return progressChannel.waitForUtterance(utteranceID)
+    }
+
+    /**
+     * An earcon is like an audible icon. It's not supposed to represent text, but rather provide
+     * an audible cue to some sort of event or to the presence of something in the text other than
+     * words. An earcon could be a sound to indicate that we're now reading bullet points from a
+     * presentation or that we've just flipped to the next page.
+     *
+     * Convention says that you should enclose your earcon name in square brackets (e.g [tick])
+     */
+    suspend fun addEarcon(earcon: String, file: File): Boolean {
+        require(earcon.isNotBlank()) { "You cannot use empty or blank earcon" }
+        return textToSpeech().addEarcon(earcon.normalizedEarcon(), file).isSuccessful
+    }
+
+    suspend fun addEarcon(earcon: String, packageName: String, resourceID: Int): Boolean {
+        require(earcon.isNotBlank()) { "You cannot use empty or blank earcon" }
+        return textToSpeech()
+            .addEarcon(earcon.normalizedEarcon(), packageName, resourceID)
+            .isSuccessful
+    }
+
+    suspend fun addEarcon(earcon: String, context: Context, resourceID: Int): Boolean {
+        return addEarcon(earcon, context.packageName, resourceID)
+    }
+
+    suspend fun playEarcon(
+        earcon: String,
+        utteranceID: String = UUID.randomUUID().toString(),
+        flushQueue: Boolean = false,
+        stream: Int = TextToSpeech.Engine.DEFAULT_STREAM
+    ): Boolean {
+        val queueMode = if (flushQueue) TextToSpeech.QUEUE_FLUSH else TextToSpeech.QUEUE_ADD
+        val params = Bundle().apply {
+            putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, stream)
+        }
+
+        val normalized = earcon.normalizedEarcon()
+
+        if (!textToSpeech().playEarcon(normalized, queueMode, params, utteranceID).isSuccessful)
+            return false
+
+        return progressChannel.waitForUtterance(utteranceID)
     }
 
     fun isSpeaking() = textToSpeechInstance?.isSpeaking ?: false

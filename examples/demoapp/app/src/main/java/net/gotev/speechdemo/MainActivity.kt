@@ -107,16 +107,20 @@ class MainActivity : AppCompatActivity(), SpeechDelegate {
     }
 
     private fun onSpeakClick() {
-        if (textToSpeech.text.toString().trim { it <= ' ' }.isEmpty()) {
+        if (textToSpeech.text.isNullOrBlank()) {
             lifecycleScope.launchWhenResumed {
+                speak.isEnabled = false
                 println(ttsEngine.speak(getString(R.string.input_something)))
+                speak.isEnabled = true
             }
             Toast.makeText(this, R.string.input_something, Toast.LENGTH_LONG).show()
             return
         }
 
         lifecycleScope.launchWhenResumed {
+            speak.isEnabled = false
             println(ttsEngine.speak(textToSpeech.text.toString()))
+            speak.isEnabled = true
         }
     }
 

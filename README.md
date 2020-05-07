@@ -110,6 +110,32 @@ try {
 }
 ```
 
+### Continuous Speech recognition
+Inside an onSpeechResult Method:
+```java
+@Override
+public void onSpeechResult(String result) {
+        
+       text.setText(result);
+       Speech.getInstance().stopTextToSpeech();
+        
+       Handler handler = new Handler();
+       handler.postDelayed(new Runnable() {
+             @Override
+             public void run() {
+                  try {
+                      Speech.getInstance().startListening(progress, MainActivity.this);
+                  } catch (SpeechRecognitionNotAvailable speechRecognitionNotAvailable) {
+                      speechRecognitionNotAvailable.printStackTrace();
+                  } catch (GoogleVoiceTypingDisabledException e) {
+                      e.printStackTrace();
+                  }
+             }
+        }, 100);
+}
+
+```
+
 ### Release resources
 In your Activity's `onDestroy`, add:
 ```java

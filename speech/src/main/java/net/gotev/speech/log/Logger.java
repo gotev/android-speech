@@ -1,4 +1,6 @@
-package net.gotev.speech;
+package net.gotev.speech.log;
+
+import net.gotev.speech.BuildConfig;
 
 /**
  * Android Speech library logger.

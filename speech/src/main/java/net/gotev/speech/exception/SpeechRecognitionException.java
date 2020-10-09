@@ -1,4 +1,4 @@
-package net.gotev.speech;
+package net.gotev.speech.exception;
 
 import android.speech.SpeechRecognizer;
 

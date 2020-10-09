@@ -3,6 +3,8 @@ package net.gotev.speech;
 import android.content.Context;
 import android.os.Handler;
 
+import net.gotev.speech.log.Logger;
+
 import java.util.Timer;
 import java.util.TimerTask;
 

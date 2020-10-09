@@ -11,6 +11,10 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 import android.widget.LinearLayout;
 
+import net.gotev.speech.exception.GoogleVoiceTypingDisabledException;
+import net.gotev.speech.exception.SpeechRecognitionException;
+import net.gotev.speech.exception.SpeechRecognitionNotAvailableException;
+import net.gotev.speech.log.Logger;
 import net.gotev.speech.ui.SpeechProgressView;
 
 import java.util.ArrayList;
@@ -201,12 +205,12 @@ public class Speech {
 
     private Speech(final Context context) {
         initSpeechRecognizer(context);
-        initTts(context);
+        initTts(context, mTttsInitListener);
     }
 
     private Speech(final Context context, final String callingPackage) {
         initSpeechRecognizer(context);
-        initTts(context);
+        initTts(context, mTttsInitListener);
         mCallingPackage = callingPackage;
     }
 
@@ -240,7 +244,7 @@ public class Speech {
         mUnstableData = null;
     }
 
-    private void initTts(final Context context) {
+    private void initTts(final Context context, final TextToSpeech.OnInitListener mTttsInitListener) {
         if (mTextToSpeech == null) {
             mTtsProgressListener = new TtsProgressListener(mContext, mTtsCallbacks);
             mTextToSpeech = new TextToSpeech(context.getApplicationContext(), mTttsInitListener);
@@ -339,11 +343,11 @@ public class Speech {
      * Starts voice recognition.
      *
      * @param delegate delegate which will receive speech recognition events and status
-     * @throws SpeechRecognitionNotAvailable      when speech recognition is not available on the device
+     * @throws SpeechRecognitionNotAvailableException      when speech recognition is not available on the device
      * @throws GoogleVoiceTypingDisabledException when google voice typing is disabled on the device
      */
     public void startListening(final SpeechDelegate delegate)
-            throws SpeechRecognitionNotAvailable, GoogleVoiceTypingDisabledException {
+            throws SpeechRecognitionNotAvailableException, GoogleVoiceTypingDisabledException {
         startListening(null, delegate);
     }
 
@@ -352,15 +356,15 @@ public class Speech {
      *
      * @param progressView view in which to draw speech animation
      * @param delegate     delegate which will receive speech recognition events and status
-     * @throws SpeechRecognitionNotAvailable      when speech recognition is not available on the device
+     * @throws SpeechRecognitionNotAvailableException      when speech recognition is not available on the device
      * @throws GoogleVoiceTypingDisabledException when google voice typing is disabled on the device
      */
     public void startListening(final SpeechProgressView progressView, final SpeechDelegate delegate)
-            throws SpeechRecognitionNotAvailable, GoogleVoiceTypingDisabledException {
+            throws SpeechRecognitionNotAvailableException, GoogleVoiceTypingDisabledException {
         if (mIsListening) return;
 
         if (mSpeechRecognizer == null)
-            throw new SpeechRecognitionNotAvailable();
+            throw new SpeechRecognitionNotAvailableException();
 
         if (delegate == null)
             throw new IllegalArgumentException("delegate must be defined!");

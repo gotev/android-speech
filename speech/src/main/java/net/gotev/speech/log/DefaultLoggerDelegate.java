@@ -1,6 +1,8 @@
-package net.gotev.speech;
+package net.gotev.speech.log;
 
 import android.util.Log;
+
+import net.gotev.speech.Speech;
 
 /**
  * Default logger delegate implementation which logs in LogCat with {@link Log}.

@@ -39,21 +39,26 @@ public class Speech {
     private int mAudioStream = TextToSpeech.Engine.DEFAULT_STREAM;
     private UtteranceProgressListener mTtsProgressListener;
 
-    private final SpeechRecognitionListener mListener = new BaseSpeechRecognitionListener();
+    private SpeechRecognitionListener speechRecognitionListener;
 
     private Speech(final Context context) {
-        this(context, null, new DummyOnInitListener());
+        this(context, null, new DummyOnInitListener(), new BaseSpeechRecognitionListener());
     }
 
     private Speech(final Context context, final String callingPackage) {
-        this(context, callingPackage, new DummyOnInitListener());
+        this(context, callingPackage, new DummyOnInitListener(), new BaseSpeechRecognitionListener());
     }
 
     public Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener) {
+        this(context, callingPackage, onInitListener, new BaseSpeechRecognitionListener());
+    }
+
+    public Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionListener speechRecognitionListener) {
         mContext = context;
         mTttsInitListener = onInitListener;
-        mListener.setCallingPackage(callingPackage);
-        mListener.initSpeechRecognizer(context);
+        this.speechRecognitionListener = speechRecognitionListener;
+        this.speechRecognitionListener.setCallingPackage(callingPackage);
+        this.speechRecognitionListener.initSpeechRecognizer(context);
         initTts(context);
     }
 
@@ -62,7 +67,7 @@ public class Speech {
             mTtsProgressListener = new TtsProgressListener(mContext, mTtsCallbacks);
             mTextToSpeech = new TextToSpeech(context.getApplicationContext(), mTttsInitListener);
             mTextToSpeech.setOnUtteranceProgressListener(mTtsProgressListener);
-            mTextToSpeech.setLanguage(mListener.getLocale());
+            mTextToSpeech.setLanguage(speechRecognitionListener.getLocale());
             mTextToSpeech.setPitch(mTtsPitch);
             mTextToSpeech.setSpeechRate(mTtsRate);
         }
@@ -116,7 +121,7 @@ public class Speech {
      * Must be called inside Activity's onDestroy.
      */
     public synchronized void shutdown() {
-        mListener.shutdown();
+        speechRecognitionListener.shutdown();
 
         if (mTextToSpeech != null) {
             try {
@@ -167,7 +172,7 @@ public class Speech {
     public void startListening(final SpeechProgressView progressView, final SpeechDelegate delegate)
             throws SpeechRecognitionNotAvailableException, GoogleVoiceTypingDisabledException {
 
-        mListener.startListening(progressView, delegate);
+        speechRecognitionListener.startListening(progressView, delegate);
     }
 
     /**
@@ -175,15 +180,15 @@ public class Speech {
      * This method does nothing if voice listening is not active
      */
     public void stopListening() {
-        mListener.stopListening();
+        speechRecognitionListener.stopListening();
         returnPartialResultsAndRecreateSpeechRecognizer();
     }
 
     private void returnPartialResultsAndRecreateSpeechRecognizer() {
-        mListener.returnPartialResultsAndRecreateSpeechRecognizer();
+        speechRecognitionListener.returnPartialResultsAndRecreateSpeechRecognizer();
 
         // recreate the speech recognizer
-        mListener.initSpeechRecognizer(mContext);
+        speechRecognitionListener.initSpeechRecognizer(mContext);
     }
 
     /**
@@ -192,7 +197,7 @@ public class Speech {
      * @return true if the voice recognition is on, false otherwise
      */
     public boolean isListening() {
-        return mListener.isListening();
+        return speechRecognitionListener.isListening();
     }
 
     /**
@@ -247,7 +252,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setPreferOffline(final boolean preferOffline) {
-        mListener.setPreferOffline(preferOffline);
+        speechRecognitionListener.setPreferOffline(preferOffline);
         return this;
     }
 
@@ -259,7 +264,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setGetPartialResults(final boolean getPartialResults) {
-        mListener.setPartialResults(getPartialResults);
+        speechRecognitionListener.setPartialResults(getPartialResults);
         return this;
     }
 
@@ -271,7 +276,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setLocale(final Locale locale) {
-        mListener.setLocale(locale);
+        speechRecognitionListener.setLocale(locale);
 
         if (mTextToSpeech != null)
             mTextToSpeech.setLanguage(locale);
@@ -313,8 +318,8 @@ public class Speech {
      * @return speech instance
      */
     public Speech setStopListeningAfterInactivity(final long milliseconds) {
-        mListener.setStopListeningAfterInactivity(milliseconds);
-        mListener.init(mContext);
+        speechRecognitionListener.setStopListeningAfterInactivity(milliseconds);
+        speechRecognitionListener.init(mContext);
         return this;
     }
 
@@ -326,7 +331,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setTransitionMinimumDelay(final long milliseconds) {
-        mListener.setTransitionMinimumDelay(milliseconds);
+        speechRecognitionListener.setTransitionMinimumDelay(milliseconds);
         return this;
     }
 

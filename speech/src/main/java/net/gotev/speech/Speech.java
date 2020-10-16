@@ -1,23 +1,18 @@
 package net.gotev.speech;
 
 import android.content.Context;
-import android.os.Build;
-import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.UtteranceProgressListener;
 
 import net.gotev.speech.exception.GoogleVoiceTypingDisabledException;
 import net.gotev.speech.exception.SpeechRecognitionNotAvailableException;
 import net.gotev.speech.listener.BaseSpeechRecognitionListener;
 import net.gotev.speech.listener.DummyOnInitListener;
 import net.gotev.speech.listener.SpeechRecognitionListener;
-import net.gotev.speech.log.Logger;
+import net.gotev.speech.listener.BaseTextToSpeechListener;
+import net.gotev.speech.listener.TextToSpeechListener;
 import net.gotev.speech.ui.SpeechProgressView;
 
-import java.util.HashMap;
 import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Helper class to easily work with Android speech recognition.
@@ -30,15 +25,7 @@ public class Speech {
 
     private Context mContext;
 
-    private TextToSpeech mTextToSpeech;
-    private TextToSpeech.OnInitListener mTttsInitListener;
-    private final Map<String, TextToSpeechCallback> mTtsCallbacks = new HashMap<>();
-    private float mTtsRate = 1.0f;
-    private float mTtsPitch = 1.0f;
-    private int mTtsQueueMode = TextToSpeech.QUEUE_FLUSH;
-    private int mAudioStream = TextToSpeech.Engine.DEFAULT_STREAM;
-    private UtteranceProgressListener mTtsProgressListener;
-
+    private TextToSpeechListener ttsListener;
     private SpeechRecognitionListener speechRecognitionListener;
 
     private Speech(final Context context) {
@@ -54,23 +41,19 @@ public class Speech {
     }
 
     public Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionListener speechRecognitionListener) {
+        this(context, callingPackage, onInitListener, new BaseSpeechRecognitionListener(), new BaseTextToSpeechListener());
+    }
+
+    public Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionListener speechRecognitionListener, TextToSpeechListener textToSpeechListener) {
         mContext = context;
-        mTttsInitListener = onInitListener;
+
+        this.ttsListener = textToSpeechListener;
         this.speechRecognitionListener = speechRecognitionListener;
         this.speechRecognitionListener.setCallingPackage(callingPackage);
         this.speechRecognitionListener.initSpeechRecognizer(context);
-        initTts(context);
-    }
 
-    private void initTts(final Context context) {
-        if (mTextToSpeech == null) {
-            mTtsProgressListener = new TtsProgressListener(mContext, mTtsCallbacks);
-            mTextToSpeech = new TextToSpeech(context.getApplicationContext(), mTttsInitListener);
-            mTextToSpeech.setOnUtteranceProgressListener(mTtsProgressListener);
-            mTextToSpeech.setLanguage(speechRecognitionListener.getLocale());
-            mTextToSpeech.setPitch(mTtsPitch);
-            mTextToSpeech.setSpeechRate(mTtsRate);
-        }
+        this.ttsListener.setOnInitListener(onInitListener);
+        this.ttsListener.initTextToSpeech(context);
     }
 
     /**
@@ -122,16 +105,7 @@ public class Speech {
      */
     public synchronized void shutdown() {
         speechRecognitionListener.shutdown();
-
-        if (mTextToSpeech != null) {
-            try {
-                mTtsCallbacks.clear();
-                mTextToSpeech.stop();
-                mTextToSpeech.shutdown();
-            } catch (final Exception exc) {
-                Logger.error(getClass().getSimpleName(), "Warning while de-initing text to speech", exc);
-            }
-        }
+        ttsListener.shutdown();
 
         instance = null;
     }
@@ -216,32 +190,14 @@ public class Speech {
      * @param callback callback which will receive progress status of the operation
      */
     public void say(final String message, final TextToSpeechCallback callback) {
-
-        final String utteranceId = UUID.randomUUID().toString();
-
-        if (callback != null) {
-            mTtsCallbacks.put(utteranceId, callback);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            final Bundle params = new Bundle();
-            params.putString(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(mAudioStream));
-            mTextToSpeech.speak(message, mTtsQueueMode, params, utteranceId);
-        } else {
-            final HashMap<String, String> params = new HashMap<>();
-            params.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(mAudioStream));
-            params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId);
-            mTextToSpeech.speak(message, mTtsQueueMode, params);
-        }
+        ttsListener.say(message, callback);
     }
 
     /**
      * Stops text to speech.
      */
     public void stopTextToSpeech() {
-        if (mTextToSpeech != null) {
-            mTextToSpeech.stop();
-        }
+        ttsListener.stop();
     }
 
     /**
@@ -277,9 +233,8 @@ public class Speech {
      */
     public Speech setLocale(final Locale locale) {
         speechRecognitionListener.setLocale(locale);
+        ttsListener.setLocale(locale);
 
-        if (mTextToSpeech != null)
-            mTextToSpeech.setLanguage(locale);
         return this;
     }
 
@@ -292,8 +247,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setTextToSpeechRate(final float rate) {
-        mTtsRate = rate;
-        mTextToSpeech.setSpeechRate(rate);
+        ttsListener.setSpeechRate(rate);
         return this;
     }
 
@@ -306,8 +260,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setTextToSpeechPitch(final float pitch) {
-        mTtsPitch = pitch;
-        mTextToSpeech.setPitch(pitch);
+        ttsListener.setPitch(pitch);
         return this;
     }
 
@@ -345,7 +298,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setTextToSpeechQueueMode(final int mode) {
-        mTtsQueueMode = mode;
+        ttsListener.setTextToSpeechQueueMode(mode);
         return this;
     }
 
@@ -359,8 +312,8 @@ public class Speech {
      *                    e.g. {@link android.media.AudioManager#STREAM_VOICE_CALL}
      * @return speech instance
      */
-    public Speech setAudioStream(final int audioStream){
-        mAudioStream = audioStream;
+    public Speech setAudioStream(final int audioStream) {
+        ttsListener.setAudioStream(audioStream);
         return this;
     }
 

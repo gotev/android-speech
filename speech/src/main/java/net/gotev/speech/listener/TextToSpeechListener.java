@@ -12,6 +12,8 @@ public interface TextToSpeechListener {
 
     void initTextToSpeech(Context context);
 
+    boolean isSpeaking();
+
     void say(String message, TextToSpeechCallback callback);
 
     void stop();

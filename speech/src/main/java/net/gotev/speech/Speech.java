@@ -176,6 +176,15 @@ public class Speech {
     }
 
     /**
+     * Check if text to speak is currently speaking.
+     *
+     * @return true if the text to speak is speaking, false otherwise
+     */
+    public boolean isSpeaking() {
+        return ttsListener.isSpeaking();
+    }
+
+    /**
      * Uses text to speech to transform a written message into a sound.
      *
      * @param message message to play

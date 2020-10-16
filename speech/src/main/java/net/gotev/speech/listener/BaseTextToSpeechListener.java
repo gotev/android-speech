@@ -52,6 +52,15 @@ public class BaseTextToSpeechListener implements TextToSpeechListener {
         }
     }
 
+    @Override
+    public boolean isSpeaking() {
+        if (mTextToSpeech == null) {
+            return false;
+        }
+
+        return mTextToSpeech.isSpeaking();
+    }
+
     public void setOnInitListener(TextToSpeech.OnInitListener onInitListener) {
         this.mTttsInitListener = onInitListener;
     }

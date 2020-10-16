@@ -2,6 +2,7 @@ package net.gotev.speech;
 
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.Voice;
 
 import net.gotev.speech.exception.GoogleVoiceTypingDisabledException;
 import net.gotev.speech.exception.SpeechRecognitionNotAvailableException;
@@ -234,7 +235,6 @@ public class Speech {
     public Speech setLocale(final Locale locale) {
         speechRecognitionListener.setLocale(locale);
         ttsListener.setLocale(locale);
-
         return this;
     }
 
@@ -248,6 +248,18 @@ public class Speech {
      */
     public Speech setTextToSpeechRate(final float rate) {
         ttsListener.setSpeechRate(rate);
+        return this;
+    }
+
+    /**
+     * Sets the voice for the TextToSpeech engine.
+     * This has no effect on any pre-recorded speech.
+     *
+     * @param voice Speech voice.
+     * @return speech instance
+     */
+    public Speech setVoice(final Voice voice) {
+        ttsListener.setVoice(voice);
         return this;
     }
 
@@ -301,7 +313,6 @@ public class Speech {
         ttsListener.setTextToSpeechQueueMode(mode);
         return this;
     }
-
 
     /**
      * Sets the audio stream type.

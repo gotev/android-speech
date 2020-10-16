@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
+import android.speech.tts.Voice;
 
 import net.gotev.speech.TextToSpeechCallback;
 import net.gotev.speech.TtsProgressListener;
@@ -23,6 +24,7 @@ public class BaseTextToSpeechListener implements TextToSpeechListener {
     private float mTtsRate = 1.0f;
     private float mTtsPitch = 1.0f;
     private Locale mLocale = Locale.getDefault();
+    private Voice voice;
 
     private int mTtsQueueMode = TextToSpeech.QUEUE_FLUSH;
     private int mAudioStream = TextToSpeech.Engine.DEFAULT_STREAM;
@@ -41,6 +43,13 @@ public class BaseTextToSpeechListener implements TextToSpeechListener {
         mTextToSpeech.setLanguage(mLocale);
         mTextToSpeech.setPitch(mTtsPitch);
         mTextToSpeech.setSpeechRate(mTtsRate);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (voice == null) {
+                voice = mTextToSpeech.getDefaultVoice();
+            }
+            mTextToSpeech.setVoice(voice);
+        }
     }
 
     public void setOnInitListener(TextToSpeech.OnInitListener onInitListener) {
@@ -118,6 +127,16 @@ public class BaseTextToSpeechListener implements TextToSpeechListener {
         mTtsRate = rate;
         if (mTextToSpeech != null) {
             mTextToSpeech.setSpeechRate(rate);
+        }
+    }
+
+    @Override
+    public void setVoice(Voice voice) {
+        this.voice = voice;
+        if (mTextToSpeech != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                mTextToSpeech.setVoice(voice);
+            }
         }
     }
 }

@@ -42,17 +42,17 @@ public class Speech {
     }
 
     public Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionListener speechRecognitionListener) {
-        this(context, callingPackage, onInitListener, new BaseSpeechRecognitionListener(), new BaseTextToSpeechListener());
+        this(context, callingPackage, onInitListener, speechRecognitionListener, new BaseTextToSpeechListener());
     }
 
     public Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionListener speechRecognitionListener, TextToSpeechListener textToSpeechListener) {
         mContext = context;
 
-        this.ttsListener = textToSpeechListener;
         this.speechRecognitionListener = speechRecognitionListener;
         this.speechRecognitionListener.setCallingPackage(callingPackage);
         this.speechRecognitionListener.initSpeechRecognizer(context);
 
+        this.ttsListener = textToSpeechListener;
         this.ttsListener.setOnInitListener(onInitListener);
         this.ttsListener.initTextToSpeech(context);
     }

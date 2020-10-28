@@ -4,8 +4,6 @@ import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
 
-import net.gotev.speech.exception.GoogleVoiceTypingDisabledException;
-import net.gotev.speech.exception.SpeechRecognitionNotAvailableException;
 import net.gotev.speech.listener.BaseSpeechRecognitionListener;
 import net.gotev.speech.listener.DummyOnInitListener;
 import net.gotev.speech.listener.SpeechRecognitionListener;
@@ -128,11 +126,11 @@ public class Speech {
      * Starts voice recognition.
      *
      * @param delegate delegate which will receive speech recognition events and status
-     * @throws SpeechRecognitionNotAvailableException      when speech recognition is not available on the device
+     * @throws SpeechRecognitionNotAvailable      when speech recognition is not available on the device
      * @throws GoogleVoiceTypingDisabledException when google voice typing is disabled on the device
      */
     public void startListening(final SpeechDelegate delegate)
-            throws SpeechRecognitionNotAvailableException, GoogleVoiceTypingDisabledException {
+            throws SpeechRecognitionNotAvailable, GoogleVoiceTypingDisabledException {
         startListening(null, delegate);
     }
 
@@ -141,11 +139,11 @@ public class Speech {
      *
      * @param progressView view in which to draw speech animation
      * @param delegate     delegate which will receive speech recognition events and status
-     * @throws SpeechRecognitionNotAvailableException      when speech recognition is not available on the device
+     * @throws SpeechRecognitionNotAvailable      when speech recognition is not available on the device
      * @throws GoogleVoiceTypingDisabledException when google voice typing is disabled on the device
      */
     public void startListening(final SpeechProgressView progressView, final SpeechDelegate delegate)
-            throws SpeechRecognitionNotAvailableException, GoogleVoiceTypingDisabledException {
+            throws SpeechRecognitionNotAvailable, GoogleVoiceTypingDisabledException {
 
         speechRecognitionListener.startListening(progressView, delegate);
     }

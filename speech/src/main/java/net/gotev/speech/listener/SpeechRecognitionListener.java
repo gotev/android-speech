@@ -4,8 +4,8 @@ import android.content.Context;
 import android.speech.RecognitionListener;
 
 import net.gotev.speech.SpeechDelegate;
-import net.gotev.speech.exception.GoogleVoiceTypingDisabledException;
-import net.gotev.speech.exception.SpeechRecognitionNotAvailableException;
+import net.gotev.speech.GoogleVoiceTypingDisabledException;
+import net.gotev.speech.SpeechRecognitionNotAvailable;
 import net.gotev.speech.ui.SpeechProgressView;
 
 import java.util.Locale;
@@ -20,7 +20,7 @@ public interface SpeechRecognitionListener extends RecognitionListener {
 
     void initSpeechRecognizer(Context context);
 
-    void startListening(SpeechProgressView progressView, SpeechDelegate delegate) throws SpeechRecognitionNotAvailableException, GoogleVoiceTypingDisabledException;
+    void startListening(SpeechProgressView progressView, SpeechDelegate delegate) throws SpeechRecognitionNotAvailable, GoogleVoiceTypingDisabledException;
 
     void stopListening();
 

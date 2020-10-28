@@ -11,10 +11,10 @@ import android.widget.LinearLayout;
 import net.gotev.speech.DelayedOperation;
 import net.gotev.speech.Speech;
 import net.gotev.speech.SpeechDelegate;
-import net.gotev.speech.exception.GoogleVoiceTypingDisabledException;
-import net.gotev.speech.exception.SpeechRecognitionException;
-import net.gotev.speech.exception.SpeechRecognitionNotAvailableException;
-import net.gotev.speech.log.Logger;
+import net.gotev.speech.GoogleVoiceTypingDisabledException;
+import net.gotev.speech.SpeechRecognitionException;
+import net.gotev.speech.SpeechRecognitionNotAvailable;
+import net.gotev.speech.Logger;
 import net.gotev.speech.ui.SpeechProgressView;
 
 import java.util.ArrayList;
@@ -189,11 +189,11 @@ public class BaseSpeechRecognitionListener implements SpeechRecognitionListener 
     }
 
     @Override
-    public void startListening(SpeechProgressView progressView, SpeechDelegate delegate) throws SpeechRecognitionNotAvailableException, GoogleVoiceTypingDisabledException {
+    public void startListening(SpeechProgressView progressView, SpeechDelegate delegate) throws SpeechRecognitionNotAvailable, GoogleVoiceTypingDisabledException {
         if (mIsListening) return;
 
         if (mSpeechRecognizer == null)
-            throw new SpeechRecognitionNotAvailableException();
+            throw new SpeechRecognitionNotAvailable();
 
         if (delegate == null)
             throw new IllegalArgumentException("delegate must be defined!");

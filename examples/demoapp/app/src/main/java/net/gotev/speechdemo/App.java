@@ -2,8 +2,7 @@ package net.gotev.speechdemo;
 
 import android.app.Application;
 
-import net.gotev.speech.Speech;
-import net.gotev.speech.log.Logger;
+import net.gotev.speech.Logger;
 
 /**
  * @author Aleksandar Gotev

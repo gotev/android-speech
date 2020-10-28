@@ -13,13 +13,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.gotev.speech.exception.GoogleVoiceTypingDisabledException;
-import net.gotev.speech.exception.SpeechRecognitionNotAvailableException;
+import net.gotev.speech.GoogleVoiceTypingDisabledException;
+import net.gotev.speech.SpeechRecognitionNotAvailable;
 import net.gotev.speech.Speech;
 import net.gotev.speech.SpeechDelegate;
 import net.gotev.speech.SpeechUtil;
 import net.gotev.speech.TextToSpeechCallback;
-import net.gotev.speech.log.Logger;
+import net.gotev.speech.Logger;
 import net.gotev.speech.ui.SpeechProgressView;
 import net.gotev.toyproject.R;
 
@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
             Speech.getInstance().stopTextToSpeech();
             Speech.getInstance().startListening(progress, MainActivity.this);
 
-        } catch (SpeechRecognitionNotAvailableException exc) {
+        } catch (SpeechRecognitionNotAvailable exc) {
             showSpeechNotSupportedDialog();
 
         } catch (GoogleVoiceTypingDisabledException exc) {

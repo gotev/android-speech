@@ -9,7 +9,7 @@ import android.speech.tts.Voice;
 
 import net.gotev.speech.TextToSpeechCallback;
 import net.gotev.speech.TtsProgressListener;
-import net.gotev.speech.log.Logger;
+import net.gotev.speech.Logger;
 
 import java.util.HashMap;
 import java.util.Locale;

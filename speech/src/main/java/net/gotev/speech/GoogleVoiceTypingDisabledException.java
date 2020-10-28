@@ -1,4 +1,4 @@
-package net.gotev.speech.exception;
+package net.gotev.speech;
 
 /**
  * @author Aleksandar Gotev

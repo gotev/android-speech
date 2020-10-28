@@ -1,4 +1,4 @@
-package net.gotev.speech.listener;
+package net.gotev.speech.engine;
 
 import android.content.Context;
 import android.speech.tts.TextToSpeech;
@@ -8,7 +8,7 @@ import net.gotev.speech.TextToSpeechCallback;
 
 import java.util.Locale;
 
-public interface TextToSpeechListener {
+public interface TextToSpeechEngine {
 
     void initTextToSpeech(Context context);
 

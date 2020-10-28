@@ -4,11 +4,11 @@ import android.content.Context;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
 
-import net.gotev.speech.listener.BaseSpeechRecognitionListener;
-import net.gotev.speech.listener.DummyOnInitListener;
-import net.gotev.speech.listener.SpeechRecognitionListener;
-import net.gotev.speech.listener.BaseTextToSpeechListener;
-import net.gotev.speech.listener.TextToSpeechListener;
+import net.gotev.speech.engine.BaseSpeechRecognitionEngine;
+import net.gotev.speech.engine.DummyOnInitListener;
+import net.gotev.speech.engine.SpeechRecognitionEngine;
+import net.gotev.speech.engine.BaseTextToSpeechEngine;
+import net.gotev.speech.engine.TextToSpeechEngine;
 import net.gotev.speech.ui.SpeechProgressView;
 
 import java.util.Locale;
@@ -24,33 +24,33 @@ public class Speech {
 
     private Context mContext;
 
-    private TextToSpeechListener ttsListener;
-    private SpeechRecognitionListener speechRecognitionListener;
+    private TextToSpeechEngine ttsListener;
+    private SpeechRecognitionEngine speechRecognitionEngine;
 
-    private Speech(final Context context) {
-        this(context, null, new DummyOnInitListener(), new BaseSpeechRecognitionListener());
+    public Speech(final Context context) {
+        this(context, null, new DummyOnInitListener(), new BaseSpeechRecognitionEngine());
     }
 
-    private Speech(final Context context, final String callingPackage) {
-        this(context, callingPackage, new DummyOnInitListener(), new BaseSpeechRecognitionListener());
+    public Speech(final Context context, final String callingPackage) {
+        this(context, callingPackage, new DummyOnInitListener(), new BaseSpeechRecognitionEngine());
     }
 
     public Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener) {
-        this(context, callingPackage, onInitListener, new BaseSpeechRecognitionListener());
+        this(context, callingPackage, onInitListener, new BaseSpeechRecognitionEngine());
     }
 
-    public Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionListener speechRecognitionListener) {
-        this(context, callingPackage, onInitListener, speechRecognitionListener, new BaseTextToSpeechListener());
+    public Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionEngine speechRecognitionEngine) {
+        this(context, callingPackage, onInitListener, speechRecognitionEngine, new BaseTextToSpeechEngine());
     }
 
-    public Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionListener speechRecognitionListener, TextToSpeechListener textToSpeechListener) {
+    public Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionEngine speechRecognitionEngine, TextToSpeechEngine textToSpeechEngine) {
         mContext = context;
 
-        this.speechRecognitionListener = speechRecognitionListener;
-        this.speechRecognitionListener.setCallingPackage(callingPackage);
-        this.speechRecognitionListener.initSpeechRecognizer(context);
+        this.speechRecognitionEngine = speechRecognitionEngine;
+        this.speechRecognitionEngine.setCallingPackage(callingPackage);
+        this.speechRecognitionEngine.initSpeechRecognizer(context);
 
-        this.ttsListener = textToSpeechListener;
+        this.ttsListener = textToSpeechEngine;
         this.ttsListener.setOnInitListener(onInitListener);
         this.ttsListener.initTextToSpeech(context);
     }
@@ -103,7 +103,7 @@ public class Speech {
      * Must be called inside Activity's onDestroy.
      */
     public synchronized void shutdown() {
-        speechRecognitionListener.shutdown();
+        speechRecognitionEngine.shutdown();
         ttsListener.shutdown();
 
         instance = null;
@@ -145,7 +145,7 @@ public class Speech {
     public void startListening(final SpeechProgressView progressView, final SpeechDelegate delegate)
             throws SpeechRecognitionNotAvailable, GoogleVoiceTypingDisabledException {
 
-        speechRecognitionListener.startListening(progressView, delegate);
+        speechRecognitionEngine.startListening(progressView, delegate);
     }
 
     /**
@@ -153,15 +153,15 @@ public class Speech {
      * This method does nothing if voice listening is not active
      */
     public void stopListening() {
-        speechRecognitionListener.stopListening();
+        speechRecognitionEngine.stopListening();
         returnPartialResultsAndRecreateSpeechRecognizer();
     }
 
     private void returnPartialResultsAndRecreateSpeechRecognizer() {
-        speechRecognitionListener.returnPartialResultsAndRecreateSpeechRecognizer();
+        speechRecognitionEngine.returnPartialResultsAndRecreateSpeechRecognizer();
 
         // recreate the speech recognizer
-        speechRecognitionListener.initSpeechRecognizer(mContext);
+        speechRecognitionEngine.initSpeechRecognizer(mContext);
     }
 
     /**
@@ -170,7 +170,7 @@ public class Speech {
      * @return true if the voice recognition is on, false otherwise
      */
     public boolean isListening() {
-        return speechRecognitionListener.isListening();
+        return speechRecognitionEngine.isListening();
     }
 
     /**
@@ -216,7 +216,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setPreferOffline(final boolean preferOffline) {
-        speechRecognitionListener.setPreferOffline(preferOffline);
+        speechRecognitionEngine.setPreferOffline(preferOffline);
         return this;
     }
 
@@ -228,7 +228,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setGetPartialResults(final boolean getPartialResults) {
-        speechRecognitionListener.setPartialResults(getPartialResults);
+        speechRecognitionEngine.setPartialResults(getPartialResults);
         return this;
     }
 
@@ -240,7 +240,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setLocale(final Locale locale) {
-        speechRecognitionListener.setLocale(locale);
+        speechRecognitionEngine.setLocale(locale);
         ttsListener.setLocale(locale);
         return this;
     }
@@ -290,8 +290,8 @@ public class Speech {
      * @return speech instance
      */
     public Speech setStopListeningAfterInactivity(final long milliseconds) {
-        speechRecognitionListener.setStopListeningAfterInactivity(milliseconds);
-        speechRecognitionListener.init(mContext);
+        speechRecognitionEngine.setStopListeningAfterInactivity(milliseconds);
+        speechRecognitionEngine.init(mContext);
         return this;
     }
 
@@ -303,7 +303,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setTransitionMinimumDelay(final long milliseconds) {
-        speechRecognitionListener.setTransitionMinimumDelay(milliseconds);
+        speechRecognitionEngine.setTransitionMinimumDelay(milliseconds);
         return this;
     }
 

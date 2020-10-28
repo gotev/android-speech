@@ -1,4 +1,4 @@
-package net.gotev.speech.listener;
+package net.gotev.speech.engine;
 
 import android.content.Context;
 import android.content.Intent;
@@ -22,8 +22,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class BaseSpeechRecognitionListener implements SpeechRecognitionListener {
-    private static final String LOG_TAG = BaseSpeechRecognitionListener.class.getSimpleName();
+public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
+    private static final String LOG_TAG = BaseSpeechRecognitionEngine.class.getSimpleName();
 
     private Context mContext;
 

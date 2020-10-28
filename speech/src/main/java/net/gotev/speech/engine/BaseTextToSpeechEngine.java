@@ -1,4 +1,4 @@
-package net.gotev.speech.listener;
+package net.gotev.speech.engine;
 
 import android.content.Context;
 import android.os.Build;
@@ -16,7 +16,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
-public class BaseTextToSpeechListener implements TextToSpeechListener {
+public class BaseTextToSpeechEngine implements TextToSpeechEngine {
 
     private TextToSpeech mTextToSpeech;
     private TextToSpeech.OnInitListener mTttsInitListener;

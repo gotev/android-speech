@@ -1,4 +1,4 @@
-package net.gotev.speech.listener;
+package net.gotev.speech.engine;
 
 import android.content.Context;
 import android.speech.RecognitionListener;
@@ -10,7 +10,7 @@ import net.gotev.speech.ui.SpeechProgressView;
 
 import java.util.Locale;
 
-public interface SpeechRecognitionListener extends RecognitionListener {
+public interface SpeechRecognitionEngine extends RecognitionListener {
 
     void init(Context context);
 

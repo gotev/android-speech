@@ -27,22 +27,6 @@ public class Speech {
     private TextToSpeechEngine ttsListener;
     private SpeechRecognitionEngine speechRecognitionEngine;
 
-    private Speech(final Context context) {
-        this(context, null, new DummyOnInitListener(), new BaseSpeechRecognitionEngine());
-    }
-
-    private Speech(final Context context, final String callingPackage) {
-        this(context, callingPackage, new DummyOnInitListener(), new BaseSpeechRecognitionEngine());
-    }
-
-    private Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener) {
-        this(context, callingPackage, onInitListener, new BaseSpeechRecognitionEngine());
-    }
-
-    private Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionEngine speechRecognitionEngine) {
-        this(context, callingPackage, onInitListener, speechRecognitionEngine, new BaseTextToSpeechEngine());
-    }
-
     private Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionEngine speechRecognitionEngine, TextToSpeechEngine textToSpeechEngine) {
         mContext = context;
 
@@ -63,7 +47,7 @@ public class Speech {
      */
     public static Speech init(final Context context) {
         if (instance == null) {
-            instance = new Speech(context);
+            instance = new Speech(context, null, new DummyOnInitListener(), new BaseSpeechRecognitionEngine(), new BaseTextToSpeechEngine());
         }
 
         return instance;
@@ -85,7 +69,7 @@ public class Speech {
      */
     public static Speech init(final Context context, final String callingPackage) {
         if (instance == null) {
-            instance = new Speech(context, callingPackage);
+            instance = new Speech(context, callingPackage, new DummyOnInitListener(), new BaseSpeechRecognitionEngine(), new BaseTextToSpeechEngine());
         }
 
         return instance;
@@ -93,7 +77,7 @@ public class Speech {
 
     public static Speech init(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener) {
         if (instance == null) {
-            instance = new Speech(context, callingPackage, onInitListener);
+            instance = new Speech(context, callingPackage, onInitListener, new BaseSpeechRecognitionEngine(), new BaseTextToSpeechEngine());
         }
 
         return instance;

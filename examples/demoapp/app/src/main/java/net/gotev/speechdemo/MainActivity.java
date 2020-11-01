@@ -5,6 +5,10 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,17 +17,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import net.gotev.speech.GoogleVoiceTypingDisabledException;
-import net.gotev.speech.SpeechRecognitionNotAvailable;
-import net.gotev.speech.Speech;
-import net.gotev.speech.SpeechDelegate;
-import net.gotev.speech.SpeechUtil;
-import net.gotev.speech.TextToSpeechCallback;
-import net.gotev.speech.Logger;
+import net.gotev.speech.*;
 import net.gotev.speech.ui.SpeechProgressView;
 import net.gotev.toyproject.R;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Speech.init(this, getPackageName(), mTttsInitListener);
+        Speech.init(this, getPackageName());
 
         linearLayout = findViewById(R.id.linearLayout);
 
@@ -89,6 +89,46 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
                 ContextCompat.getColor(this, android.R.color.holo_red_dark)
         };
         progress.setColors(colors);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.supportedLanguages:
+                onSupportedLanguages();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private void onSupportedLanguages() {
+        Speech.getInstance().getSupportedTextToSpeechLanguages(new SupportedLanguagesListener() {
+            @Override
+            public void onSupportedLanguages(List<String> supportedLanguages) {
+                CharSequence[] items = new CharSequence[supportedLanguages.size()];
+                supportedLanguages.toArray(items);
+
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle(getString(R.string.supported_tts_langs))
+                        .setItems(items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Toast.makeText(MainActivity.this, "Selected: " + items[i], Toast.LENGTH_LONG).show();
+                            }
+                        })
+                        .setPositiveButton("OK", null)
+                        .create()
+                        .show();
+            }
+        });
     }
 
     @Override

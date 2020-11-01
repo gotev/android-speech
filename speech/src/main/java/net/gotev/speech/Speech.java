@@ -1,6 +1,10 @@
 package net.gotev.speech;
 
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
 
@@ -11,6 +15,7 @@ import net.gotev.speech.engine.BaseTextToSpeechEngine;
 import net.gotev.speech.engine.TextToSpeechEngine;
 import net.gotev.speech.ui.SpeechProgressView;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -24,7 +29,7 @@ public class Speech {
 
     private Context mContext;
 
-    private TextToSpeechEngine ttsListener;
+    private TextToSpeechEngine textToSpeechEngine;
     private SpeechRecognitionEngine speechRecognitionEngine;
 
     private Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionEngine speechRecognitionEngine, TextToSpeechEngine textToSpeechEngine) {
@@ -34,9 +39,9 @@ public class Speech {
         this.speechRecognitionEngine.setCallingPackage(callingPackage);
         this.speechRecognitionEngine.initSpeechRecognizer(context);
 
-        this.ttsListener = textToSpeechEngine;
-        this.ttsListener.setOnInitListener(onInitListener);
-        this.ttsListener.initTextToSpeech(context);
+        this.textToSpeechEngine = textToSpeechEngine;
+        this.textToSpeechEngine.setOnInitListener(onInitListener);
+        this.textToSpeechEngine.initTextToSpeech(context);
     }
 
     /**
@@ -96,7 +101,7 @@ public class Speech {
      */
     public synchronized void shutdown() {
         speechRecognitionEngine.shutdown();
-        ttsListener.shutdown();
+        textToSpeechEngine.shutdown();
 
         instance = null;
     }
@@ -171,7 +176,7 @@ public class Speech {
      * @return true if the text to speak is speaking, false otherwise
      */
     public boolean isSpeaking() {
-        return ttsListener.isSpeaking();
+        return textToSpeechEngine.isSpeaking();
     }
 
     /**
@@ -190,14 +195,14 @@ public class Speech {
      * @param callback callback which will receive progress status of the operation
      */
     public void say(final String message, final TextToSpeechCallback callback) {
-        ttsListener.say(message, callback);
+        textToSpeechEngine.say(message, callback);
     }
 
     /**
      * Stops text to speech.
      */
     public void stopTextToSpeech() {
-        ttsListener.stop();
+        textToSpeechEngine.stop();
     }
 
     /**
@@ -233,7 +238,7 @@ public class Speech {
      */
     public Speech setLocale(final Locale locale) {
         speechRecognitionEngine.setLocale(locale);
-        ttsListener.setLocale(locale);
+        textToSpeechEngine.setLocale(locale);
         return this;
     }
 
@@ -246,7 +251,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setTextToSpeechRate(final float rate) {
-        ttsListener.setSpeechRate(rate);
+        textToSpeechEngine.setSpeechRate(rate);
         return this;
     }
 
@@ -258,7 +263,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setVoice(final Voice voice) {
-        ttsListener.setVoice(voice);
+        textToSpeechEngine.setVoice(voice);
         return this;
     }
 
@@ -271,7 +276,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setTextToSpeechPitch(final float pitch) {
-        ttsListener.setPitch(pitch);
+        textToSpeechEngine.setPitch(pitch);
         return this;
     }
 
@@ -309,7 +314,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setTextToSpeechQueueMode(final int mode) {
-        ttsListener.setTextToSpeechQueueMode(mode);
+        textToSpeechEngine.setTextToSpeechQueueMode(mode);
         return this;
     }
 
@@ -323,8 +328,23 @@ public class Speech {
      * @return speech instance
      */
     public Speech setAudioStream(final int audioStream) {
-        ttsListener.setAudioStream(audioStream);
+        textToSpeechEngine.setAudioStream(audioStream);
         return this;
+    }
+
+    /**
+     * Gets the list of the supported text to speech languages on this device
+     * @param listener listner which will receive the results
+     */
+    public void getSupportedTextToSpeechLanguages(SupportedLanguagesListener listener) {
+        Intent intent = RecognizerIntent.getVoiceDetailsIntent(mContext);
+        mContext.sendOrderedBroadcast(intent, null, new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                List<String> languages = getResultExtras(true).getStringArrayList(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES);
+                listener.onSupportedLanguages(languages);
+            }
+        }, null, Activity.RESULT_OK, null, null);
     }
 
 }

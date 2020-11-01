@@ -5,8 +5,8 @@ Android speech recognition and text to speech made easy
 
 ## Setup
 ### Gradle
-```
-implementation 'net.gotev:speech:1.4.0'
+```groovy
+implementation 'net.gotev:speech:1.5.0'
 ```
 
 ## Initialization
@@ -195,6 +195,17 @@ You can configure various parameters by using the setter methods on the speech i
 Speech.getInstance()
 ```
 Refer to JavaDocs for a complete reference.
+
+## Get current locale and voice (since 1.5.0)
+Use `Speech.getInstance().getSpeechToTextLanguage()` and `Speech.getinstance().getTextToSpeechVoice()`. Check the demo app for a complete example.
+
+## Get supported Speech To Text languages and Text To Speech voices (since 1.5.0)
+Use `Speech.getInstance().getSupportedSpeechToTextLanguages(listener)` and `Speech.getInstance().getSupportedTextToSpeechVoices()`. Check the demo app for a complete example.
+
+## Set Speech To Text Language and Text To Speech voice
+Use `Speech.getInstance().setLocale(locale)` and `Speech.getInstance().setVoice(voice)`. Check the demo app for a complete example.
+
+> When you set the locale, the voice is automatically changed to the default voice of that language. If you want to set a particular voice, remember to re-set it every time you change the locale, too.
 
 ## Credits
 Thanks to @zagum for the original implementation of the [speech recognition view](https://github.com/zagum/SpeechRecognitionView).

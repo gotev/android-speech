@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.speech.tts.TextToSpeech;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,11 +14,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import net.gotev.speech.GoogleVoiceTypingDisabledException;
+import net.gotev.speech.SpeechRecognitionNotAvailable;
 import net.gotev.speech.Speech;
 import net.gotev.speech.SpeechDelegate;
-import net.gotev.speech.SpeechRecognitionNotAvailable;
 import net.gotev.speech.SpeechUtil;
 import net.gotev.speech.TextToSpeechCallback;
+import net.gotev.speech.Logger;
 import net.gotev.speech.ui.SpeechProgressView;
 import net.gotev.toyproject.R;
 
@@ -32,6 +34,7 @@ import androidx.core.content.ContextCompat;
 public class MainActivity extends AppCompatActivity implements SpeechDelegate {
 
     private final int PERMISSIONS_REQUEST = 1;
+    private static final String LOG_TAG = MainActivity.class.getSimpleName();
 
     private ImageButton button;
     private Button speak;
@@ -40,12 +43,31 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
     private SpeechProgressView progress;
     private LinearLayout linearLayout;
 
+    private TextToSpeech.OnInitListener mTttsInitListener = new TextToSpeech.OnInitListener() {
+        @Override
+        public void onInit(final int status) {
+            switch (status) {
+                case TextToSpeech.SUCCESS:
+                    Logger.info(LOG_TAG, "TextToSpeech engine successfully started");
+                    break;
+
+                case TextToSpeech.ERROR:
+                    Logger.error(LOG_TAG, "Error while initializing TextToSpeech engine!");
+                    break;
+
+                default:
+                    Logger.error(LOG_TAG, "Unknown TextToSpeech status: " + status);
+                    break;
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Speech.init(this, getPackageName());
+        Speech.init(this, getPackageName(), mTttsInitListener);
 
         linearLayout = findViewById(R.id.linearLayout);
 

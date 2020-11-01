@@ -1,25 +1,17 @@
 package net.gotev.speech;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
-import android.os.Bundle;
-import android.speech.RecognitionListener;
-import android.speech.RecognizerIntent;
-import android.speech.SpeechRecognizer;
 import android.speech.tts.TextToSpeech;
-import android.speech.tts.UtteranceProgressListener;
-import android.widget.LinearLayout;
+import android.speech.tts.Voice;
 
+import net.gotev.speech.engine.BaseSpeechRecognitionEngine;
+import net.gotev.speech.engine.DummyOnInitListener;
+import net.gotev.speech.engine.SpeechRecognitionEngine;
+import net.gotev.speech.engine.BaseTextToSpeechEngine;
+import net.gotev.speech.engine.TextToSpeechEngine;
 import net.gotev.speech.ui.SpeechProgressView;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * Helper class to easily work with Android speech recognition.
@@ -28,236 +20,23 @@ import java.util.UUID;
  */
 public class Speech {
 
-    private static final String LOG_TAG = Speech.class.getSimpleName();
-
     private static Speech instance = null;
 
-    private SpeechRecognizer mSpeechRecognizer;
-    private SpeechProgressView mProgressView;
-    private String mCallingPackage;
-    private boolean mPreferOffline = false;
-    private boolean mGetPartialResults = true;
-    private SpeechDelegate mDelegate;
-    private boolean mIsListening = false;
-
-    private final List<String> mPartialData = new ArrayList<>();
-    private String mUnstableData;
-
-    private DelayedOperation mDelayedStopListening;
     private Context mContext;
 
-    private TextToSpeech mTextToSpeech;
-    private final Map<String, TextToSpeechCallback> mTtsCallbacks = new HashMap<>();
-    private Locale mLocale = Locale.getDefault();
-    private float mTtsRate = 1.0f;
-    private float mTtsPitch = 1.0f;
-    private int mTtsQueueMode = TextToSpeech.QUEUE_FLUSH;
-    private long mStopListeningDelayInMs = 4000;
-    private long mTransitionMinimumDelay = 1200;
-    private int mAudioStream = TextToSpeech.Engine.DEFAULT_STREAM;
-    private long mLastActionTimestamp;
-    private List<String> mLastPartialResults = null;
+    private TextToSpeechEngine ttsListener;
+    private SpeechRecognitionEngine speechRecognitionEngine;
 
-    private final TextToSpeech.OnInitListener mTttsInitListener = new TextToSpeech.OnInitListener() {
-        @Override
-        public void onInit(final int status) {
-            switch (status) {
-                case TextToSpeech.SUCCESS:
-                    Logger.info(LOG_TAG, "TextToSpeech engine successfully started");
-                    break;
-
-                case TextToSpeech.ERROR:
-                    Logger.error(LOG_TAG, "Error while initializing TextToSpeech engine!");
-                    break;
-
-                default:
-                    Logger.error(LOG_TAG, "Unknown TextToSpeech status: " + status);
-                    break;
-            }
-        }
-    };
-
-    private UtteranceProgressListener mTtsProgressListener;
-
-    private final RecognitionListener mListener = new RecognitionListener() {
-
-        @Override
-        public void onReadyForSpeech(final Bundle bundle) {
-            mPartialData.clear();
-            mUnstableData = null;
-        }
-
-        @Override
-        public void onBeginningOfSpeech() {
-            if (mProgressView != null)
-                mProgressView.onBeginningOfSpeech();
-
-            mDelayedStopListening.start(new DelayedOperation.Operation() {
-                @Override
-                public void onDelayedOperation() {
-                    returnPartialResultsAndRecreateSpeechRecognizer();
-                }
-
-                @Override
-                public boolean shouldExecuteDelayedOperation() {
-                    return true;
-                }
-            });
-        }
-
-        @Override
-        public void onRmsChanged(final float v) {
-            try {
-                if (mDelegate != null)
-                    mDelegate.onSpeechRmsChanged(v);
-            } catch (final Throwable exc) {
-                Logger.error(Speech.class.getSimpleName(),
-                        "Unhandled exception in delegate onSpeechRmsChanged", exc);
-            }
-
-            if (mProgressView != null)
-                mProgressView.onRmsChanged(v);
-        }
-
-        @Override
-        public void onPartialResults(final Bundle bundle) {
-            mDelayedStopListening.resetTimer();
-
-            final List<String> partialResults = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-            final List<String> unstableData = bundle.getStringArrayList("android.speech.extra.UNSTABLE_TEXT");
-
-            if (partialResults != null && !partialResults.isEmpty()) {
-                mPartialData.clear();
-                mPartialData.addAll(partialResults);
-                mUnstableData = unstableData != null && !unstableData.isEmpty()
-                        ? unstableData.get(0) : null;
-                try {
-                    if (mLastPartialResults == null || !mLastPartialResults.equals(partialResults)) {
-                        if (mDelegate != null)
-                            mDelegate.onSpeechPartialResults(partialResults);
-                        mLastPartialResults = partialResults;
-                    }
-                } catch (final Throwable exc) {
-                    Logger.error(Speech.class.getSimpleName(),
-                            "Unhandled exception in delegate onSpeechPartialResults", exc);
-                }
-            }
-        }
-
-        @Override
-        public void onResults(final Bundle bundle) {
-            mDelayedStopListening.cancel();
-
-            final List<String> results = bundle.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
-
-            final String result;
-
-            if (results != null && !results.isEmpty()
-                    && results.get(0) != null && !results.get(0).isEmpty()) {
-                result = results.get(0);
-            } else {
-                Logger.info(Speech.class.getSimpleName(), "No speech results, getting partial");
-                result = getPartialResultsAsString();
-            }
-
-            mIsListening = false;
-
-            try {
-                if (mDelegate != null)
-                    mDelegate.onSpeechResult(result.trim());
-            } catch (final Throwable exc) {
-                Logger.error(Speech.class.getSimpleName(),
-                        "Unhandled exception in delegate onSpeechResult", exc);
-            }
-
-            if (mProgressView != null)
-                mProgressView.onResultOrOnError();
-
-            initSpeechRecognizer(mContext);
-        }
-
-        @Override
-        public void onError(final int code) {
-            Logger.error(LOG_TAG, "Speech recognition error", new SpeechRecognitionException(code));
-            returnPartialResultsAndRecreateSpeechRecognizer();
-        }
-
-        @Override
-        public void onBufferReceived(final byte[] bytes) {
-
-        }
-
-        @Override
-        public void onEndOfSpeech() {
-            if (mProgressView != null)
-                mProgressView.onEndOfSpeech();
-        }
-
-        @Override
-        public void onEvent(final int i, final Bundle bundle) {
-
-        }
-    };
-
-    private Speech(final Context context) {
-        initSpeechRecognizer(context);
-        initTts(context);
-    }
-
-    private Speech(final Context context, final String callingPackage) {
-        initSpeechRecognizer(context);
-        initTts(context);
-        mCallingPackage = callingPackage;
-    }
-
-    private void initSpeechRecognizer(final Context context) {
-        if (context == null)
-            throw new IllegalArgumentException("context must be defined!");
-
+    private Speech(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionEngine speechRecognitionEngine, TextToSpeechEngine textToSpeechEngine) {
         mContext = context;
 
-        if (SpeechRecognizer.isRecognitionAvailable(context)) {
-            if (mSpeechRecognizer != null) {
-                try {
-                    mSpeechRecognizer.destroy();
-                } catch (final Throwable exc) {
-                    Logger.debug(Speech.class.getSimpleName(),
-                            "Non-Fatal error while destroying speech. " + exc.getMessage());
-                } finally {
-                    mSpeechRecognizer = null;
-                }
-            }
+        this.speechRecognitionEngine = speechRecognitionEngine;
+        this.speechRecognitionEngine.setCallingPackage(callingPackage);
+        this.speechRecognitionEngine.initSpeechRecognizer(context);
 
-            mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(context);
-            mSpeechRecognizer.setRecognitionListener(mListener);
-            initDelayedStopListening(context);
-
-        } else {
-            mSpeechRecognizer = null;
-        }
-
-        mPartialData.clear();
-        mUnstableData = null;
-    }
-
-    private void initTts(final Context context) {
-        if (mTextToSpeech == null) {
-            mTtsProgressListener = new TtsProgressListener(mContext, mTtsCallbacks);
-            mTextToSpeech = new TextToSpeech(context.getApplicationContext(), mTttsInitListener);
-            mTextToSpeech.setOnUtteranceProgressListener(mTtsProgressListener);
-            mTextToSpeech.setLanguage(mLocale);
-            mTextToSpeech.setPitch(mTtsPitch);
-            mTextToSpeech.setSpeechRate(mTtsRate);
-        }
-    }
-
-    private void initDelayedStopListening(final Context context) {
-        if (mDelayedStopListening != null) {
-            mDelayedStopListening.cancel();
-            mDelayedStopListening = null;
-        }
-
-        mDelayedStopListening = new DelayedOperation(context, "delayStopListening", mStopListeningDelayInMs);
+        this.ttsListener = textToSpeechEngine;
+        this.ttsListener.setOnInitListener(onInitListener);
+        this.ttsListener.initTextToSpeech(context);
     }
 
     /**
@@ -268,7 +47,7 @@ public class Speech {
      */
     public static Speech init(final Context context) {
         if (instance == null) {
-            instance = new Speech(context);
+            instance = new Speech(context, null, new DummyOnInitListener(), new BaseSpeechRecognitionEngine(), new BaseTextToSpeechEngine());
         }
 
         return instance;
@@ -290,7 +69,23 @@ public class Speech {
      */
     public static Speech init(final Context context, final String callingPackage) {
         if (instance == null) {
-            instance = new Speech(context, callingPackage);
+            instance = new Speech(context, callingPackage, new DummyOnInitListener(), new BaseSpeechRecognitionEngine(), new BaseTextToSpeechEngine());
+        }
+
+        return instance;
+    }
+
+    public static Speech init(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener) {
+        if (instance == null) {
+            instance = new Speech(context, callingPackage, onInitListener, new BaseSpeechRecognitionEngine(), new BaseTextToSpeechEngine());
+        }
+
+        return instance;
+    }
+
+    public static Speech init(final Context context, final String callingPackage, TextToSpeech.OnInitListener onInitListener, SpeechRecognitionEngine speechRecognitionEngine, TextToSpeechEngine textToSpeechEngine) {
+        if (instance == null) {
+            instance = new Speech(context, callingPackage, onInitListener, speechRecognitionEngine, textToSpeechEngine);
         }
 
         return instance;
@@ -300,25 +95,9 @@ public class Speech {
      * Must be called inside Activity's onDestroy.
      */
     public synchronized void shutdown() {
-        if (mSpeechRecognizer != null) {
-            try {
-                mSpeechRecognizer.stopListening();
-            } catch (final Exception exc) {
-                Logger.error(getClass().getSimpleName(), "Warning while de-initing speech recognizer", exc);
-            }
-        }
+        speechRecognitionEngine.shutdown();
+        ttsListener.shutdown();
 
-        if (mTextToSpeech != null) {
-            try {
-                mTtsCallbacks.clear();
-                mTextToSpeech.stop();
-                mTextToSpeech.shutdown();
-            } catch (final Exception exc) {
-                Logger.error(getClass().getSimpleName(), "Warning while de-initing text to speech", exc);
-            }
-        }
-
-        unregisterDelegate();
         instance = null;
     }
 
@@ -357,69 +136,8 @@ public class Speech {
      */
     public void startListening(final SpeechProgressView progressView, final SpeechDelegate delegate)
             throws SpeechRecognitionNotAvailable, GoogleVoiceTypingDisabledException {
-        if (mIsListening) return;
 
-        if (mSpeechRecognizer == null)
-            throw new SpeechRecognitionNotAvailable();
-
-        if (delegate == null)
-            throw new IllegalArgumentException("delegate must be defined!");
-
-        if (throttleAction()) {
-            Logger.debug(getClass().getSimpleName(), "Hey man calm down! Throttling start to prevent disaster!");
-            return;
-        }
-
-        if (progressView != null && !(progressView.getParent() instanceof LinearLayout))
-            throw new IllegalArgumentException("progressView must be put inside a LinearLayout!");
-
-        mProgressView = progressView;
-        mDelegate = delegate;
-
-        final Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
-                .putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 1)
-                .putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, mGetPartialResults)
-                .putExtra(RecognizerIntent.EXTRA_LANGUAGE, mLocale.getLanguage())
-                .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-
-        if (mCallingPackage != null && !mCallingPackage.isEmpty()) {
-            intent.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, mCallingPackage);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            intent.putExtra(RecognizerIntent.EXTRA_PREFER_OFFLINE, mPreferOffline);
-        }
-
-        try {
-            mSpeechRecognizer.startListening(intent);
-        } catch (final SecurityException exc) {
-            throw new GoogleVoiceTypingDisabledException();
-        }
-
-        mIsListening = true;
-        updateLastActionTimestamp();
-
-        try {
-            if (mDelegate != null)
-                mDelegate.onStartOfSpeech();
-        } catch (final Throwable exc) {
-            Logger.error(Speech.class.getSimpleName(),
-                    "Unhandled exception in delegate onStartOfSpeech", exc);
-        }
-
-    }
-
-    private void unregisterDelegate() {
-        mDelegate = null;
-        mProgressView = null;
-    }
-
-    private void updateLastActionTimestamp() {
-        mLastActionTimestamp = new Date().getTime();
-    }
-
-    private boolean throttleAction() {
-        return (new Date().getTime() <= (mLastActionTimestamp + mTransitionMinimumDelay));
+        speechRecognitionEngine.startListening(progressView, delegate);
     }
 
     /**
@@ -427,46 +145,15 @@ public class Speech {
      * This method does nothing if voice listening is not active
      */
     public void stopListening() {
-        if (!mIsListening) return;
-
-        if (throttleAction()) {
-            Logger.debug(getClass().getSimpleName(), "Hey man calm down! Throttling stop to prevent disaster!");
-            return;
-        }
-
-        mIsListening = false;
-        updateLastActionTimestamp();
+        speechRecognitionEngine.stopListening();
         returnPartialResultsAndRecreateSpeechRecognizer();
     }
 
-    private String getPartialResultsAsString() {
-        final StringBuilder out = new StringBuilder("");
-
-        for (final String partial : mPartialData) {
-            out.append(partial).append(" ");
-        }
-
-        if (mUnstableData != null && !mUnstableData.isEmpty())
-            out.append(mUnstableData);
-
-        return out.toString().trim();
-    }
-
     private void returnPartialResultsAndRecreateSpeechRecognizer() {
-        mIsListening = false;
-        try {
-            if (mDelegate != null)
-                mDelegate.onSpeechResult(getPartialResultsAsString());
-        } catch (final Throwable exc) {
-            Logger.error(Speech.class.getSimpleName(),
-                    "Unhandled exception in delegate onSpeechResult", exc);
-        }
-
-        if (mProgressView != null)
-            mProgressView.onResultOrOnError();
+        speechRecognitionEngine.returnPartialResultsAndRecreateSpeechRecognizer();
 
         // recreate the speech recognizer
-        initSpeechRecognizer(mContext);
+        speechRecognitionEngine.initSpeechRecognizer(mContext);
     }
 
     /**
@@ -475,7 +162,16 @@ public class Speech {
      * @return true if the voice recognition is on, false otherwise
      */
     public boolean isListening() {
-        return mIsListening;
+        return speechRecognitionEngine.isListening();
+    }
+
+    /**
+     * Check if text to speak is currently speaking.
+     *
+     * @return true if the text to speak is speaking, false otherwise
+     */
+    public boolean isSpeaking() {
+        return ttsListener.isSpeaking();
     }
 
     /**
@@ -494,32 +190,14 @@ public class Speech {
      * @param callback callback which will receive progress status of the operation
      */
     public void say(final String message, final TextToSpeechCallback callback) {
-
-        final String utteranceId = UUID.randomUUID().toString();
-
-        if (callback != null) {
-            mTtsCallbacks.put(utteranceId, callback);
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            final Bundle params = new Bundle();
-            params.putString(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(mAudioStream));
-            mTextToSpeech.speak(message, mTtsQueueMode, params, utteranceId);
-        } else {
-            final HashMap<String, String> params = new HashMap<>();
-            params.put(TextToSpeech.Engine.KEY_PARAM_STREAM, String.valueOf(mAudioStream));
-            params.put(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId);
-            mTextToSpeech.speak(message, mTtsQueueMode, params);
-        }
+        ttsListener.say(message, callback);
     }
 
     /**
      * Stops text to speech.
      */
     public void stopTextToSpeech() {
-        if (mTextToSpeech != null) {
-            mTextToSpeech.stop();
-        }
+        ttsListener.stop();
     }
 
     /**
@@ -530,7 +208,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setPreferOffline(final boolean preferOffline) {
-        mPreferOffline = preferOffline;
+        speechRecognitionEngine.setPreferOffline(preferOffline);
         return this;
     }
 
@@ -542,7 +220,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setGetPartialResults(final boolean getPartialResults) {
-        mGetPartialResults = getPartialResults;
+        speechRecognitionEngine.setPartialResults(getPartialResults);
         return this;
     }
 
@@ -554,9 +232,8 @@ public class Speech {
      * @return speech instance
      */
     public Speech setLocale(final Locale locale) {
-        mLocale = locale;
-        if (mTextToSpeech != null)
-            mTextToSpeech.setLanguage(locale);
+        speechRecognitionEngine.setLocale(locale);
+        ttsListener.setLocale(locale);
         return this;
     }
 
@@ -569,8 +246,19 @@ public class Speech {
      * @return speech instance
      */
     public Speech setTextToSpeechRate(final float rate) {
-        mTtsRate = rate;
-        mTextToSpeech.setSpeechRate(rate);
+        ttsListener.setSpeechRate(rate);
+        return this;
+    }
+
+    /**
+     * Sets the voice for the TextToSpeech engine.
+     * This has no effect on any pre-recorded speech.
+     *
+     * @param voice Speech voice.
+     * @return speech instance
+     */
+    public Speech setVoice(final Voice voice) {
+        ttsListener.setVoice(voice);
         return this;
     }
 
@@ -583,8 +271,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setTextToSpeechPitch(final float pitch) {
-        mTtsPitch = pitch;
-        mTextToSpeech.setPitch(pitch);
+        ttsListener.setPitch(pitch);
         return this;
     }
 
@@ -595,8 +282,8 @@ public class Speech {
      * @return speech instance
      */
     public Speech setStopListeningAfterInactivity(final long milliseconds) {
-        mStopListeningDelayInMs = milliseconds;
-        initDelayedStopListening(mContext);
+        speechRecognitionEngine.setStopListeningAfterInactivity(milliseconds);
+        speechRecognitionEngine.init(mContext);
         return this;
     }
 
@@ -608,7 +295,7 @@ public class Speech {
      * @return speech instance
      */
     public Speech setTransitionMinimumDelay(final long milliseconds) {
-        mTransitionMinimumDelay = milliseconds;
+        speechRecognitionEngine.setTransitionMinimumDelay(milliseconds);
         return this;
     }
 
@@ -622,10 +309,9 @@ public class Speech {
      * @return speech instance
      */
     public Speech setTextToSpeechQueueMode(final int mode) {
-        mTtsQueueMode = mode;
+        ttsListener.setTextToSpeechQueueMode(mode);
         return this;
     }
-
 
     /**
      * Sets the audio stream type.
@@ -636,8 +322,8 @@ public class Speech {
      *                    e.g. {@link android.media.AudioManager#STREAM_VOICE_CALL}
      * @return speech instance
      */
-    public Speech setAudioStream(final int audioStream){
-        mAudioStream = audioStream;
+    public Speech setAudioStream(final int audioStream) {
+        ttsListener.setAudioStream(audioStream);
         return this;
     }
 

@@ -333,10 +333,10 @@ public class Speech {
     }
 
     /**
-     * Gets the list of the supported text to speech languages on this device
+     * Gets the list of the supported speech to text languages on this device
      * @param listener listner which will receive the results
      */
-    public void getSupportedTextToSpeechLanguages(SupportedLanguagesListener listener) {
+    public void getSupportedSpeechToTextLanguages(SupportedLanguagesListener listener) {
         Intent intent = RecognizerIntent.getVoiceDetailsIntent(mContext);
         mContext.sendOrderedBroadcast(intent, null, new BroadcastReceiver() {
             @Override

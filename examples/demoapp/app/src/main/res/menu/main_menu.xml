@@ -3,5 +3,5 @@
 
     <item
         android:id="@+id/supportedLanguages"
-        android:title="@string/supported_tts_langs" />
+        android:title="@string/supported_stt_langs" />
 </menu>

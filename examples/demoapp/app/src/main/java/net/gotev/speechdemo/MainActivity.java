@@ -5,8 +5,6 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
-import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,9 +19,7 @@ import net.gotev.speech.*;
 import net.gotev.speech.ui.SpeechProgressView;
 import net.gotev.toyproject.R;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -110,14 +106,14 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
     }
 
     private void onSupportedLanguages() {
-        Speech.getInstance().getSupportedTextToSpeechLanguages(new SupportedLanguagesListener() {
+        Speech.getInstance().getSupportedSpeechToTextLanguages(new SupportedLanguagesListener() {
             @Override
             public void onSupportedLanguages(List<String> supportedLanguages) {
                 CharSequence[] items = new CharSequence[supportedLanguages.size()];
                 supportedLanguages.toArray(items);
 
                 new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(getString(R.string.supported_tts_langs))
+                        .setTitle(getString(R.string.supported_stt_langs))
                         .setItems(items, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {

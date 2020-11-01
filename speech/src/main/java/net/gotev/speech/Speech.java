@@ -15,8 +15,10 @@ import net.gotev.speech.engine.BaseTextToSpeechEngine;
 import net.gotev.speech.engine.TextToSpeechEngine;
 import net.gotev.speech.ui.SpeechProgressView;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Helper class to easily work with Android speech recognition.
@@ -342,9 +344,40 @@ public class Speech {
             @Override
             public void onReceive(Context context, Intent intent) {
                 List<String> languages = getResultExtras(true).getStringArrayList(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES);
+                Collections.sort(languages);
                 listener.onSupportedLanguages(languages);
             }
         }, null, Activity.RESULT_OK, null, null);
+    }
+
+    /**
+     * Gets the list of the supported Text to Speech languages on this device
+     * @return list of locales on android API >= 23 and empty list on lower Android, because native
+     * TTS engine does not support querying voices on API < 23. Officially it's declared that
+     * query voices support started on API 21, but in reality it started from 23.
+     * If still skeptic about this, search the web and try on your own.
+     */
+    public List<Voice> getSupportedTextToSpeechVoices() {
+        return textToSpeechEngine.getSupportedVoices();
+    }
+
+    /**
+     * Gets the locale used for speech recognition.
+     * @return speech recognition locale
+     */
+    public Locale getSpeechToTextLanguage() {
+        return speechRecognitionEngine.getLocale();
+    }
+
+    /**
+     * Gets the current voice used for text to speech.
+     * @return current voice on android API >= 23 and null on lower Android, because native
+     * TTS engine does not support querying voices on API < 23. Officially it's declared that
+     * query voices support started on API 21, but in reality it started from 23.
+     * If still skeptic about this, search the web and try on your own.
+     */
+    public Voice getTextToSpeechVoice() {
+        return textToSpeechEngine.getCurrentVoice();
     }
 
 }

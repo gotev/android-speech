@@ -6,6 +6,7 @@ import android.speech.tts.Voice;
 
 import net.gotev.speech.TextToSpeechCallback;
 
+import java.util.List;
 import java.util.Locale;
 
 public interface TextToSpeechEngine {
@@ -34,4 +35,7 @@ public interface TextToSpeechEngine {
 
     void setVoice(Voice voice);
 
+    List<Voice> getSupportedVoices();
+
+    Voice getCurrentVoice();
 }

@@ -3,8 +3,10 @@ package net.gotev.speechdemo;
 import android.Manifest;
 import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
+import android.speech.tts.Voice;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +21,7 @@ import net.gotev.speech.*;
 import net.gotev.speech.ui.SpeechProgressView;
 import net.gotev.toyproject.R;
 
-import java.util.List;
+import java.util.*;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -63,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Speech.init(this, getPackageName());
+        Speech.init(this, getPackageName(), mTttsInitListener);
 
         linearLayout = findViewById(R.id.linearLayout);
 
@@ -74,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         speak.setOnClickListener(view -> onSpeakClick());
 
         text = findViewById(R.id.text);
-        textToSpeech = findViewById(R.id.textToSpeech) ;
+        textToSpeech = findViewById(R.id.textToSpeech);
         progress = findViewById(R.id.progress);
 
         int[] colors = {
@@ -96,8 +98,12 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.supportedLanguages:
-                onSupportedLanguages();
+            case R.id.supportedSTTLanguages:
+                onSetSpeechToTextLanguage();
+                return true;
+
+            case R.id.supportedTTSLanguages:
+                onSetTextToSpeechVoice();
                 return true;
 
             default:
@@ -105,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         }
     }
 
-    private void onSupportedLanguages() {
+    private void onSetSpeechToTextLanguage() {
         Speech.getInstance().getSupportedSpeechToTextLanguages(new SupportedLanguagesListener() {
             @Override
             public void onSupportedLanguages(List<String> supportedLanguages) {
@@ -113,18 +119,70 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
                 supportedLanguages.toArray(items);
 
                 new AlertDialog.Builder(MainActivity.this)
-                        .setTitle(getString(R.string.supported_stt_langs))
+                        .setTitle("Current language: " + Speech.getInstance().getSpeechToTextLanguage())
                         .setItems(items, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
+                                Locale locale;
+
+                                if (Build.VERSION.SDK_INT >= 21) {
+                                    locale = Locale.forLanguageTag(supportedLanguages.get(i));
+                                } else {
+                                    String[] langParts = supportedLanguages.get(i).split("-");
+
+                                    if (langParts.length >= 2) {
+                                        locale = new Locale(langParts[0], langParts[1]);
+                                    } else {
+                                        locale = new Locale(langParts[0]);
+                                    }
+                                }
+
+                                Speech.getInstance().setLocale(locale);
                                 Toast.makeText(MainActivity.this, "Selected: " + items[i], Toast.LENGTH_LONG).show();
                             }
                         })
-                        .setPositiveButton("OK", null)
+                        .setPositiveButton("Cancel", null)
                         .create()
                         .show();
             }
         });
+    }
+
+    private void onSetTextToSpeechVoice() {
+        List<Voice> supportedVoices = Speech.getInstance().getSupportedTextToSpeechVoices();
+
+        if (supportedVoices.isEmpty()) {
+            new AlertDialog.Builder(this)
+                    .setTitle(R.string.set_tts_voices)
+                    .setMessage(R.string.no_tts_voices)
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+
+        CharSequence[] items = new CharSequence[supportedVoices.size()];
+        Iterator<Voice> iterator = supportedVoices.iterator();
+        int i = 0;
+
+        while (iterator.hasNext()) {
+            Voice voice = iterator.next();
+
+            items[i] = voice.toString();
+            i++;
+        }
+
+        new AlertDialog.Builder(MainActivity.this)
+                .setTitle("Current: " + Speech.getInstance().getTextToSpeechVoice())
+                .setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Speech.getInstance().setVoice(supportedVoices.get(i));
+                        Toast.makeText(MainActivity.this, "Selected: " + items[i], Toast.LENGTH_LONG).show();
+                    }
+                })
+                .setPositiveButton("Cancel", null)
+                .create()
+                .show();
     }
 
     @Override
@@ -237,7 +295,7 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
         DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                switch (which){
+                switch (which) {
                     case DialogInterface.BUTTON_POSITIVE:
                         SpeechUtil.redirectUserToGoogleAppOnPlayStore(MainActivity.this);
                         break;

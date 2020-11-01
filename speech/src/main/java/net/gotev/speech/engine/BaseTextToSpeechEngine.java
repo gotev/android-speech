@@ -11,10 +11,7 @@ import net.gotev.speech.TextToSpeechCallback;
 import net.gotev.speech.TtsProgressListener;
 import net.gotev.speech.Logger;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class BaseTextToSpeechEngine implements TextToSpeechEngine {
 
@@ -142,10 +139,29 @@ public class BaseTextToSpeechEngine implements TextToSpeechEngine {
     @Override
     public void setVoice(Voice voice) {
         this.voice = voice;
-        if (mTextToSpeech != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                mTextToSpeech.setVoice(voice);
-            }
+        if (mTextToSpeech != null && Build.VERSION.SDK_INT >= 21) {
+            mTextToSpeech.setVoice(voice);
         }
+    }
+
+    @Override
+    public List<Voice> getSupportedVoices() {
+        if (mTextToSpeech != null && Build.VERSION.SDK_INT >= 23) {
+            Set<Voice> voices = mTextToSpeech.getVoices();
+            ArrayList<Voice> voicesList = new ArrayList<>(voices.size());
+            voicesList.addAll(voices);
+            return voicesList;
+        }
+
+        return new ArrayList<>(1);
+    }
+
+    @Override
+    public Voice getCurrentVoice() {
+        if (mTextToSpeech != null && Build.VERSION.SDK_INT >= 23) {
+            return mTextToSpeech.getVoice();
+        }
+
+        return null;
     }
 }

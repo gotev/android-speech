@@ -2,6 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/supportedLanguages"
-        android:title="@string/supported_stt_langs" />
+        android:id="@+id/supportedSTTLanguages"
+        android:title="@string/set_stt_langs" />
+
+    <item
+        android:id="@+id/supportedTTSLanguages"
+        android:title="@string/set_tts_voices" />
 </menu>

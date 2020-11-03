@@ -1,13 +1,14 @@
 # Android Speech
 [ ![Download](https://api.bintray.com/packages/gotev/maven/android-speech/images/download.svg) ](https://bintray.com/gotev/maven/android-speech/_latestVersion)
 
-Android speech recognition and text to speech made easy
+Android speech recognition and text to speech made easy.
 
 ## Setup
 ### Gradle
 ```groovy
-implementation 'net.gotev:speech:1.5.0'
+implementation 'net.gotev:speech:x.y.z'
 ```
+Replace `x.y.z` with [![Download](https://api.bintray.com/packages/gotev/maven/android-speech/images/download.svg) ](https://bintray.com/gotev/maven/android-speech/_latestVersion)
 
 ## Initialization
 To start using the library, you have to initialize it in your Activity

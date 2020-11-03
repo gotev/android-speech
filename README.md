@@ -31,38 +31,6 @@ public class YourActivity extends Activity {
 }
 ```
 
-## Logging
-By default the library logging is disabled. You can enable debug log by invoking:
-```java
-Logger.setLogLevel(LogLevel.DEBUG);
-```
-wherever you want in your code. You can adjust the level of detail from DEBUG to OFF.
-
-The library logger uses `android.util.Log` by default, so you will get the output in `LogCat`. If you want to redirect logs to different output or use a different logger, you can provide your own delegate implementation like this:
-```java
-Logger.setLoggerDelegate(new Logger.LoggerDelegate() {
-    @Override
-    public void error(String tag, String message) {
-        //your own implementation here
-    }
-
-    @Override
-    public void error(String tag, String message, Throwable exception) {
-        //your own implementation here
-    }
-
-    @Override
-    public void debug(String tag, String message) {
-        //your own implementation here
-    }
-
-    @Override
-    public void info(String tag, String message) {
-        //your own implementation here
-    }
-});
-```
-
 ## Example
 You can find a fully working demo app which uses this library in the `examples` directory. Just checkout the project and give it a try.
 
@@ -196,6 +164,38 @@ You can configure various parameters by using the setter methods on the speech i
 Speech.getInstance()
 ```
 Refer to JavaDocs for a complete reference.
+
+## Logging
+By default the library logging is disabled. You can enable debug log by invoking:
+```java
+Logger.setLogLevel(LogLevel.DEBUG);
+```
+wherever you want in your code. You can adjust the level of detail from DEBUG to OFF.
+
+The library logger uses `android.util.Log` by default, so you will get the output in `LogCat`. If you want to redirect logs to different output or use a different logger, you can provide your own delegate implementation like this:
+```java
+Logger.setLoggerDelegate(new Logger.LoggerDelegate() {
+    @Override
+    public void error(String tag, String message) {
+        //your own implementation here
+    }
+
+    @Override
+    public void error(String tag, String message, Throwable exception) {
+        //your own implementation here
+    }
+
+    @Override
+    public void debug(String tag, String message) {
+        //your own implementation here
+    }
+
+    @Override
+    public void info(String tag, String message) {
+        //your own implementation here
+    }
+});
+```
 
 ## Get current locale and voice (since 1.5.0)
 Use `Speech.getInstance().getSpeechToTextLanguage()` and `Speech.getinstance().getTextToSpeechVoice()`. Check the demo app for a complete example.

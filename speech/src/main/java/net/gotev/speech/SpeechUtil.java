@@ -20,6 +20,6 @@ public class SpeechUtil {
      */
     public static void redirectUserToGoogleAppOnPlayStore(Context context) {
         context.startActivity(new Intent(Intent.ACTION_VIEW)
-                .setData(Uri.parse("market://details?id=com.google.android.googlequicksearchbox")));
+                .setData(Uri.parse("market://details?id=" + Speech.GOOGLE_APP_PACKAGE)));
     }
 }

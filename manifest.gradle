@@ -9,10 +9,10 @@ ext {
     library_licenses = ["Apache-2.0"]
     library_licenses_url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     library_project_group = 'net.gotev'
-    library_version = '1.5.0'
+    library_version = '1.6.0'
     version_code = 1
     min_sdk = 18
-    target_sdk = 28
+    target_sdk = 30
     demo_app_id = 'net.gotev.speechdemo'
 
     // Gradle classpath dependencies versions

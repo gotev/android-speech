@@ -4,6 +4,9 @@ import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.Voice;
@@ -15,10 +18,7 @@ import net.gotev.speech.engine.BaseTextToSpeechEngine;
 import net.gotev.speech.engine.TextToSpeechEngine;
 import net.gotev.speech.ui.SpeechProgressView;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Helper class to easily work with Android speech recognition.
@@ -28,6 +28,7 @@ import java.util.Set;
 public class Speech {
 
     private static Speech instance = null;
+    protected static String GOOGLE_APP_PACKAGE = "com.google.android.googlequicksearchbox";
 
     private Context mContext;
 
@@ -334,18 +335,51 @@ public class Speech {
         return this;
     }
 
+    private boolean isGoogleAppInstalled() {
+        PackageManager packageManager = mContext.getPackageManager();
+
+        for (PackageInfo packageInfo: packageManager.getInstalledPackages(0)) {
+            if (packageInfo.packageName.contains(GOOGLE_APP_PACKAGE)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Gets the list of the supported speech to text languages on this device
      * @param listener listner which will receive the results
      */
     public void getSupportedSpeechToTextLanguages(SupportedLanguagesListener listener) {
+        if (!isGoogleAppInstalled()) {
+            listener.onNotSupported(UnsupportedReason.GOOGLE_APP_NOT_FOUND);
+            return;
+        }
+
         Intent intent = RecognizerIntent.getVoiceDetailsIntent(mContext);
+
+        if (intent == null) {
+            intent = new Intent(RecognizerIntent.ACTION_GET_LANGUAGE_DETAILS);
+            intent.setPackage(GOOGLE_APP_PACKAGE);
+        }
+
         mContext.sendOrderedBroadcast(intent, null, new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                List<String> languages = getResultExtras(true).getStringArrayList(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES);
-                Collections.sort(languages);
-                listener.onSupportedLanguages(languages);
+                Bundle extras = getResultExtras(true);
+
+                if (extras != null && extras.containsKey(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES)) {
+                    List<String> languages = extras.getStringArrayList(RecognizerIntent.EXTRA_SUPPORTED_LANGUAGES);
+                    if (languages == null || languages.isEmpty()) {
+                        listener.onNotSupported(UnsupportedReason.EMPTY_SUPPORTED_LANGUAGES);
+                    } else {
+                        Collections.sort(languages);
+                        listener.onSupportedLanguages(languages);
+                    }
+                } else {
+                    listener.onNotSupported(UnsupportedReason.EMPTY_SUPPORTED_LANGUAGES);
+                }
             }
         }, null, Activity.RESULT_OK, null, null);
     }

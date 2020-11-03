@@ -14,5 +14,6 @@
     <string name="no">No</string>
     <string name="set_stt_langs">Set Speech To Text Language</string>
     <string name="set_tts_voices">Set Text To Speech Voice</string>
+    <string name="no_langs">No languages are currently available on this device</string>
     <string name="no_tts_voices">No supported voices or you\'re running on Android API &lt; 23, which does not support querying for voices.</string>
 </resources>

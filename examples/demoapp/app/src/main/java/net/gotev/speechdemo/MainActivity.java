@@ -145,6 +145,23 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
                         .create()
                         .show();
             }
+
+            @Override
+            public void onNotSupported(UnsupportedReason reason) {
+                switch (reason) {
+                    case GOOGLE_APP_NOT_FOUND:
+                        showSpeechNotSupportedDialog();
+                        break;
+
+                    case EMPTY_SUPPORTED_LANGUAGES:
+                        new AlertDialog.Builder(MainActivity.this)
+                                .setTitle(R.string.set_stt_langs)
+                                .setMessage(R.string.no_langs)
+                                .setPositiveButton("OK", null)
+                                .show();
+                        break;
+                }
+            }
         });
     }
 

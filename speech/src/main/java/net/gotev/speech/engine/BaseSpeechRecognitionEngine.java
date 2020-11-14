@@ -266,6 +266,7 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
 
         mIsListening = false;
         updateLastActionTimestamp();
+        returnPartialResultsAndRecreateSpeechRecognizer();
     }
 
     public void initSpeechRecognizer(final Context context) {
@@ -310,6 +311,8 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
 
         if (mProgressView != null)
             mProgressView.onResultOrOnError();
+
+        initSpeechRecognizer(mContext);
     }
 
     @Override

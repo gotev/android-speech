@@ -154,14 +154,6 @@ public class Speech {
      */
     public void stopListening() {
         speechRecognitionEngine.stopListening();
-        returnPartialResultsAndRecreateSpeechRecognizer();
-    }
-
-    private void returnPartialResultsAndRecreateSpeechRecognizer() {
-        speechRecognitionEngine.returnPartialResultsAndRecreateSpeechRecognizer();
-
-        // recreate the speech recognizer
-        speechRecognitionEngine.initSpeechRecognizer(mContext);
     }
 
     /**

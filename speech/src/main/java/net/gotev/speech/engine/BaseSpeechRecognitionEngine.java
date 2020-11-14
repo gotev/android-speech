@@ -332,9 +332,9 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
         if (mDelayedStopListening != null) {
             mDelayedStopListening.cancel();
             mDelayedStopListening = null;
+            stopDueToDelay();
         }
 
-        stopDueToDelay();
         mDelayedStopListening = new DelayedOperation(context, "delayStopListening", mStopListeningDelayInMs);
     }
 

@@ -42,7 +42,7 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
     private boolean mGetPartialResults = true;
     private boolean mIsListening = false;
     private long mLastActionTimestamp;
-    protected long mStopListeningDelayInMs = 4000;
+    private long mStopListeningDelayInMs = 4000;
     private long mTransitionMinimumDelay = 1200;
 
     @Override

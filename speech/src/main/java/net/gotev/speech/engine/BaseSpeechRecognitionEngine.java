@@ -9,7 +9,6 @@ import android.speech.SpeechRecognizer;
 import android.widget.LinearLayout;
 
 import net.gotev.speech.DelayedOperation;
-import net.gotev.speech.Speech;
 import net.gotev.speech.SpeechDelegate;
 import net.gotev.speech.GoogleVoiceTypingDisabledException;
 import net.gotev.speech.SpeechRecognitionException;
@@ -87,7 +86,7 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
             if (mDelegate != null)
                 mDelegate.onSpeechRmsChanged(v);
         } catch (final Throwable exc) {
-            Logger.error(Speech.class.getSimpleName(),
+            Logger.error(getClass().getSimpleName(),
                     "Unhandled exception in delegate onSpeechRmsChanged", exc);
         }
 
@@ -114,7 +113,7 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
                     mLastPartialResults = partialResults;
                 }
             } catch (final Throwable exc) {
-                Logger.error(Speech.class.getSimpleName(),
+                Logger.error(getClass().getSimpleName(),
                         "Unhandled exception in delegate onSpeechPartialResults", exc);
             }
         }
@@ -132,7 +131,7 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
                 && results.get(0) != null && !results.get(0).isEmpty()) {
             result = results.get(0);
         } else {
-            Logger.info(Speech.class.getSimpleName(), "No speech results, getting partial");
+            Logger.info(getClass().getSimpleName(), "No speech results, getting partial");
             result = getPartialResultsAsString();
         }
 
@@ -142,7 +141,7 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
             if (mDelegate != null)
                 mDelegate.onSpeechResult(result.trim());
         } catch (final Throwable exc) {
-            Logger.error(Speech.class.getSimpleName(),
+            Logger.error(getClass().getSimpleName(),
                     "Unhandled exception in delegate onSpeechResult", exc);
         }
 
@@ -236,7 +235,7 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
             if (mDelegate != null)
                 mDelegate.onStartOfSpeech();
         } catch (final Throwable exc) {
-            Logger.error(Speech.class.getSimpleName(),
+            Logger.error(getClass().getSimpleName(),
                     "Unhandled exception in delegate onStartOfSpeech", exc);
         }
     }
@@ -267,6 +266,7 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
 
         mIsListening = false;
         updateLastActionTimestamp();
+        returnPartialResultsAndRecreateSpeechRecognizer();
     }
 
     public void initSpeechRecognizer(final Context context) {
@@ -280,7 +280,7 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
                 try {
                     mSpeechRecognizer.destroy();
                 } catch (final Throwable exc) {
-                    Logger.debug(Speech.class.getSimpleName(),
+                    Logger.debug(getClass().getSimpleName(),
                             "Non-Fatal error while destroying speech. " + exc.getMessage());
                 } finally {
                     mSpeechRecognizer = null;
@@ -305,12 +305,14 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
             if (mDelegate != null)
                 mDelegate.onSpeechResult(getPartialResultsAsString());
         } catch (final Throwable exc) {
-            Logger.error(Speech.class.getSimpleName(),
+            Logger.error(getClass().getSimpleName(),
                     "Unhandled exception in delegate onSpeechResult", exc);
         }
 
         if (mProgressView != null)
             mProgressView.onResultOrOnError();
+
+        initSpeechRecognizer(mContext);
     }
 
     @Override
@@ -333,9 +335,14 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
         if (mDelayedStopListening != null) {
             mDelayedStopListening.cancel();
             mDelayedStopListening = null;
+            stopDueToDelay();
         }
 
         mDelayedStopListening = new DelayedOperation(context, "delayStopListening", mStopListeningDelayInMs);
+    }
+
+    protected void stopDueToDelay() {
+
     }
 
     private void updateLastActionTimestamp() {
@@ -366,6 +373,7 @@ public class BaseSpeechRecognitionEngine implements SpeechRecognitionEngine {
         if (mSpeechRecognizer != null) {
             try {
                 mSpeechRecognizer.stopListening();
+                mSpeechRecognizer.destroy();
             } catch (final Exception exc) {
                 Logger.error(getClass().getSimpleName(), "Warning while de-initing speech recognizer", exc);
             }

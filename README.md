@@ -1,4 +1,4 @@
-# Android Speech [ ![Download](https://api.bintray.com/packages/gotev/maven/android-speech/images/download.svg) ](https://bintray.com/gotev/maven/android-speech/_latestVersion)  [ ![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.gotev/speech/badge.svg) ](https://maven-badges.herokuapp.com/maven-central/net.gotev/speech/badge.svg) 
+# Android Speech [ ![Download](https://api.bintray.com/packages/gotev/maven/android-speech/images/download.svg) ](https://bintray.com/gotev/maven/android-speech/_latestVersion)  [ ![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.gotev/speech/badge.svg) ](https://search.maven.org/search?q=g:net.gotev) 
 
 Android speech recognition and text to speech made easy.
 

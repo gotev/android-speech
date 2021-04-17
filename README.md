@@ -1,4 +1,4 @@
-# Android Speech [ ![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.gotev/speech/badge.svg) ](https://search.maven.org/search?q=g:net.gotev)
+# Android Speech ![Maven Central](https://img.shields.io/maven-central/v/net.gotev/speech)
 
 Android speech recognition and text to speech made easy.
 
@@ -7,7 +7,7 @@ Android speech recognition and text to speech made easy.
 ```groovy
 implementation 'net.gotev:speech:x.y.z'
 ```
-Replace `x.y.z` with [ ![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.gotev/speech/badge.svg) ](https://search.maven.org/search?q=g:net.gotev)
+Replace `x.y.z` with ![Maven Central](https://img.shields.io/maven-central/v/net.gotev/speech)
 
 ## Initialization
 To start using the library, you have to initialize it in your Activity

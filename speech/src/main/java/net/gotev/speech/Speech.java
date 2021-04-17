@@ -378,8 +378,8 @@ public class Speech {
 
     /**
      * Gets the list of the supported Text to Speech languages on this device
-     * @return list of locales on android API >= 23 and empty list on lower Android, because native
-     * TTS engine does not support querying voices on API < 23. Officially it's declared that
+     * @return list of locales on android API 23 and newer and empty list on lower Android, because native
+     * TTS engine does not support querying voices on API lower than 23. Officially it's declared that
      * query voices support started on API 21, but in reality it started from 23.
      * If still skeptic about this, search the web and try on your own.
      */
@@ -397,8 +397,8 @@ public class Speech {
 
     /**
      * Gets the current voice used for text to speech.
-     * @return current voice on android API >= 23 and null on lower Android, because native
-     * TTS engine does not support querying voices on API < 23. Officially it's declared that
+     * @return current voice on android API 23 or newer and null on lower Android, because native
+     * TTS engine does not support querying voices on API lower than 23. Officially it's declared that
      * query voices support started on API 21, but in reality it started from 23.
      * If still skeptic about this, search the web and try on your own.
      */

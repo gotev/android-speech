@@ -1,4 +1,4 @@
-# Android Speech [ ![Download](https://api.bintray.com/packages/gotev/maven/android-speech/images/download.svg) ](https://bintray.com/gotev/maven/android-speech/_latestVersion)  [ ![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.gotev/speech/badge.svg) ](https://search.maven.org/search?q=g:net.gotev) 
+# Android Speech [ ![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.gotev/speech/badge.svg) ](https://search.maven.org/search?q=g:net.gotev)
 
 Android speech recognition and text to speech made easy.
 
@@ -7,7 +7,7 @@ Android speech recognition and text to speech made easy.
 ```groovy
 implementation 'net.gotev:speech:x.y.z'
 ```
-Replace `x.y.z` with [![Download](https://api.bintray.com/packages/gotev/maven/android-speech/images/download.svg) ](https://bintray.com/gotev/maven/android-speech/_latestVersion)
+Replace `x.y.z` with [ ![Maven Central](https://maven-badges.herokuapp.com/maven-central/net.gotev/speech/badge.svg) ](https://search.maven.org/search?q=g:net.gotev)
 
 ## Initialization
 To start using the library, you have to initialize it in your Activity

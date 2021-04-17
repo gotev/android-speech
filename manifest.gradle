@@ -1,26 +1,24 @@
 ext {
+    mavRepoInternalUrl = System.getenv('LOCAL_MAVEN_URL')
+
     github_username = 'gotev'
     github_repository_name = 'android-speech'
 
     maintainer = 'Aleksandar Gotev'
 
-    library_description = 'Android speech recognition and text to speech made easy'
-    library_keywords = ['android', 'speech', 'library', 'text', 'voice', 'recognition', 'text to speech']
     library_licenses = ["Apache-2.0"]
     library_licenses_url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
     library_project_group = 'net.gotev'
-    library_version = '1.6.1'
-    version_code = 1
+    library_version = '1.6.2'
+    version_code = 2
     min_sdk = 18
     target_sdk = 30
     demo_app_id = 'net.gotev.speechdemo'
 
     // Gradle classpath dependencies versions
-    kotlin_version = '1.3.10'
-    gradle_version = '4.0.0'
-    maven_gradle_version = '2.1'
-    gradle_versions_plugin_version = '0.20.0'
-    bintray_plugin_version = '1.7'
+    kotlin_version = '1.4.10'
+    gradle_version = '4.1.3'
+    gradle_versions_plugin_version = '0.28.0'
 
     // Library and app testing dependencies versions
     junit_version = '4.12'

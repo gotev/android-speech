@@ -1,5 +1,5 @@
 # Android Speech ![Maven Central](https://img.shields.io/maven-central/v/net.gotev/speech)
-
+#### [Latest version Release Notes and Demo App](https://github.com/gotev/android-speech/releases/latest)
 Android speech recognition and text to speech made easy.
 
 ## Setup

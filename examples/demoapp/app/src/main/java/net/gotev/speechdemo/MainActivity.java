@@ -177,6 +177,9 @@ public class MainActivity extends AppCompatActivity implements SpeechDelegate {
             return;
         }
 
+        // Sort TTS voices
+        Collections.sort(supportedVoices, (v1, v2) -> v1.toString().compareTo(v2.toString()));
+        
         CharSequence[] items = new CharSequence[supportedVoices.size()];
         Iterator<Voice> iterator = supportedVoices.iterator();
         int i = 0;

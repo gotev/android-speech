@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.github.ben-manes.versions'
 
 // start - do not modify this if your project is on github
 project.ext {
